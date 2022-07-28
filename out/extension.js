@@ -10,14 +10,11 @@ function activate(context) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "acspl" is now active!');
-    context.subscriptions.push(
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
-    vscode.commands.registerCommand("acspl.helloWorld", () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.helloWorld", () => {
         vscode.window.showInformationMessage("Hello World from acspl!");
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("ascpl.askQuestion", () => {
+        vscode.window.showInformationMessage("how was your day?", "good", "bad");
     }));
 }
 exports.activate = activate;
