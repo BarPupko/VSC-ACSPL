@@ -1,0 +1,280 @@
+{
+	////////////////////////////////////////////////////////////",
+	////////////                               /////////////////",
+	////////////        Commands		       /////////////////",
+	////////////                               /////////////////",
+	////////////////////////////////////////////////////////////",
+	////////////////////////////////////////////////////////////",
+	"Loop command": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "LOOP",
+		"body": [
+			"LOOP $1",
+            "$2",
+			"END"
+		],
+		"description": "LOOP COMMAND"
+	},
+	"while command": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "WHILE",
+		"body": [
+			"WHILE ( $1 )",
+            " $2",
+			"END"
+		],
+		"description": "WHILE COMMAND"
+	},
+    "if command": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "IF",
+		"body": [
+			"if ($1)",
+            "$2",
+			"END"
+		],
+		"description": "(if COMMAND)"
+	},
+	
+	
+    "ifelse command": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "IFELSE",
+		"body": [
+			"if ($1)",
+            "   $2",
+            "   ELSE($23)",
+            "   $4",
+			"END"
+		],
+		"description": "ifelse COMMAND"
+	},
+	"BLOCK": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "Block Syntax",
+		"body": [
+			"BLOCK ",
+            "$1",
+			"END"
+		],
+		"description": "block...end"
+	},
+	"ON...RET": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "ON...RET",
+		"body": [
+			"!defines an autoroutine. An autoroutine consists of a condition, and a body. Autoroutines",
+			"!autoroutine condition is met, the autoroutine interrupts, executes the lines in the body (until RET)",
+			"!and then transfers execution control back to the interrupted program line",
+			"ON $1",
+            "   $2",
+			"RET"
+		],
+		"description": "ON...RET"
+	},
+	"Label:": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "Label Syntax",
+		"body": [
+			"CALL calls a subroutine according to a specified label. All subroutines must begin with a label and",
+			"conclude with RET.",
+			"LABEL_$1: !label name" ,
+            "   $2",
+			"RET"
+		],
+		"description": "Label Syntax"
+	},
+
+
+	"function": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "function",
+		"body": [
+			"${1|int,real,string|} function(${2|int,real,string|} ${3|ref, x |}){",
+			"$LINE_COMMENT code",
+            "     $4",
+			"}"
+		],
+		"description": "function command with variables"
+	},
+	////////////////////////////////////////////////////////////",
+	////////////                               /////////////////",
+	////////////       Variables 		       /////////////////",
+	////////////                               /////////////////",
+	////////////////////////////////////////////////////////////",
+	////////////////////////////////////////////////////////////",
+
+
+	"String:": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "String Syntax",
+		"body": [
+		"String $1($2)=\"$3\" !<-EXAMPLE-> String name(size)=value" 
+		],
+		"description": "String Syntax"
+	},
+
+	"VariableSnippet":{
+		"prefix": "_Var",
+		"body": "\\$MyVar = 2",
+		"description": "A basic snippet that places a variable into script with the $ prefix"
+	  },
+
+	 
+	////////////////////////////////////////////////////////////",
+	////////////                               /////////////////",
+	////////////        AXIS COMMANDS	       /////////////////",
+	////////////                               /////////////////",
+	////////////////////////////////////////////////////////////",
+	////////////////////////////////////////////////////////////",
+	// Axis
+    "enable 1 axis": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "enable_1_axis",
+		"body": [
+			"int x=1",
+            "ENABLE(x)",
+            "cummut(x)"
+            
+		],
+		"description": "enable_1_axis"
+	},
+    "enable 2 axis": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "enable_2_axis",
+		"body": [
+			"int x=1",
+            "int y=2",
+            "ENABLE(x,y)",
+            "cummut(x,y)"
+            
+		],
+		"description": "enable_2_axis"
+	},
+    "enable 3 axis": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "enable_3_axis",
+		"body": [
+			"int x=1",
+            "int y=2",
+            "int z=3",
+            "ENABLE(x,y,z)",
+            "cummut(x,y,z)"
+            
+		],
+		"description": "enable_3_axis"
+	},
+    "struct": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "struct",
+		"body": [
+			"struct $1{",
+            "$2",
+            "",
+            "",
+            "}"
+            
+		],
+		"description": "enable_3_axis"
+	},
+
+	////////////////////////////////////////////////////////////",
+	////////////                               /////////////////",
+	////////////        Testing	      		   /////////////////",
+	////////////                               /////////////////",
+	////////////////////////////////////////////////////////////",
+	////////////////////////////////////////////////////////////",
+	// Testing
+    "testComment": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "configTest",
+		"body": [
+			"!////////////////////////////////////////////////////////////",
+            "!////////////   Author : $1                 /////////////////",
+            "!////////////   Date:  00/00/2000           /////////////////",
+            "!////////////                               /////////////////",
+            "!////////////////////////////////////////////////////////////",
+            "!////////////////////////////////////////////////////////////",
+            "int Result = 1",
+            
+            "!Function Declaration",
+            "       ",
+            "       ",
+            "       ",
+            "       ",
+            "       ",
+            "       ",
+            "       ",
+            "!--Tests----Tests----Tests----Tests----Tests----Tests----Tests--",
+            "       ",
+            "       ",
+            "       ",
+
+            "STOP"
+            
+
+            
+		],
+		"description": "testComment"
+	},
+
+
+	// Fast Function to configure stage:
+	"configStage": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "configStage",
+		"body": [
+			"!/////////////////////Stage Configuration/////////////////////",
+           
+            "!intialization",
+            
+			"INT X = 0",
+			"INT Y = 1",
+			"INT Z = 2",
+			"ENABLE (X,Y,Z)",
+			"VEL(X) = 100                          ! Set maXimum velocity",
+			"ACC(X) = 1000                         ! Set acceleration",
+			"DEC(X) = 1000                         ! Set deceleration",
+			"JERK(X) = 10000                       ! Set jerk",
+			"KDEC(X) = 10000                       ! Set kill deceleration",
+			
+			"IF MFLAGS(X).9 = 0",
+			"COMMUT X",
+			"WAIT 10",
+			"END",
+
+            "!--Tests----Tests----Tests----Tests----Tests----Tests----Tests--",
+            "PTP (X), 20",
+            "       ",
+            "       ",
+
+            "STOP",
+            
+
+            "!--functions----functions----functions----functions----functions----functions----functions--",
+			
+
+            
+		],
+		"description": "testComment"
+	},
+	"float": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "float",
+		"body": [
+			"real",
+	
+		],
+		"description": "In acspl, float does not exist, changing the variable to real."
+	},
+	"double": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "double",
+		"body": [
+			"real",
+	
+		],
+		"description": "In acspl, double does not exist, changing the variable to real."
+	},
+	
+}
