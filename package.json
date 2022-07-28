@@ -15,22 +15,32 @@
   ],
   "activationEvents": [
     "onCommand:acspl.helloWorld",
-    "onCommand:acspl.askQuestion"
+    "onCommand:acspl.askQuestion",
+    "onCommand:extension.cscs.repl"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-      "command": "acspl.helloWorld",
-      "category": "ACSPL+",
-      "title": "Hello World"
-    },
+ "breakpoints": [
     {
-      "command": "acspl.askQuestion",
-      "category": "ACSPL+",
-      "title": "askQuestion"
+    "language": "c"
     }
-  ],
+ ],
+    "commands": [{
+        "command": "acspl.helloWorld",
+        "category": "ACSPL+",
+        "title": "Hello World"
+      },
+      {
+        "command": "acspl.askQuestion",
+        "category": "ACSPL+",
+        "title": "askQuestion"
+      },
+      {
+        "command": "extenstion.cscs.repl",
+        "title": "CSCS REPL"
+      }
+
+    ],
     "languages": [{
       "id": "acsplext",
       "aliases": [
@@ -54,6 +64,11 @@
       "language": "acsplext",
       "scopeName": "source.prg",
       "path": "./syntaxes/acsplext.tmLanguage.json"
+    }],
+    "keybindings": [{
+      "command": "extension.cscs.repl",
+      "key": "ctrl+9",
+      "when": "editorTextFocus"
     }]
   },
   "scripts": {
@@ -64,7 +79,7 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
-  
+
   "devDependencies": {
     "@types/vscode": "^1.69.0",
     "@types/glob": "^7.2.0",

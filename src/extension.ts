@@ -16,18 +16,37 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
 	vscode.commands.registerCommand("acspl.askQuestion",async ()=>{
 		const answer = await vscode.window.showInformationMessage(
-      "how was your day?",
-      "good",
-      "bad");
+      "how's the extenstion,do you enjoy?",
+      "yes",
+      "no");
 
-      if(answer === "bad"){
-        vscode.window.showInformationMessage("sorry to hear that");
+      if(answer === "no"){
+        vscode.window.showInformationMessage("sorry to hear that, you can address you problem to barpupco@gmail.com");
       }else{
         vscode.window.showInformationMessage("great to hear :)");
 
       }
 	})
   );
+
+  
+
+  //handler
+
+//   getDiagnostic
+// const diagnosticCollection = vscode.languages.createDiagnosticCollection('types-insta')
+
+// const handler = async(doc:vscode.TextDocument) => {
+//   if(!doc.fileName.endsWith('package.json')){
+//     return;
+//   }
+
+//   const diagnostics = await getDiagnostics(doc);
+//   diagnostics.set(doc.uri, diagnostics);
+// }
+
+// const didOpen= vscode.workspace.onDidOpenTextDocument(doc => handler(doc));
+// const didChange= vscode.workspace.onDidOpenTextDocument(doc => handler(e.document));
 
 }//end of activate
 
