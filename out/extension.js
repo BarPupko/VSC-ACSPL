@@ -11,12 +11,12 @@ function activate(context) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "acspl" is now active!');
     context.subscriptions.push(vscode.commands.registerCommand("acspl.helloWorld", () => {
-        vscode.window.showInformationMessage("Hello World from acspl!");
+        vscode.window.showInformationMessage("Hello World from acspl1!");
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("ascpl.askQuestion", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.askQuestion", () => {
         vscode.window.showInformationMessage("how was your day?", "good", "bad");
     }));
-}
+} //end of activate
 exports.activate = activate;
 // this method is called when your extension is deactivated
 function deactivate() { }

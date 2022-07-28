@@ -14,14 +14,23 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:acspl.helloWorld"
+    "onCommand:acspl.helloWorld",
+    "onCommand:acspl.askQuestion"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [{
+    "commands": [
+      {
       "command": "acspl.helloWorld",
+      "category": "ACSPL+",
       "title": "Hello World"
-    }],
+    },
+    {
+      "command": "acspl.askQuestion",
+      "category": "ACSPL+",
+      "title": "askQuestion"
+    }
+  ],
     "languages": [{
       "id": "acsplext",
       "aliases": [

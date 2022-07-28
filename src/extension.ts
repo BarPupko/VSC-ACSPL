@@ -10,19 +10,20 @@ export function activate(context: vscode.ExtensionContext) {
   console.log('Congratulations, your extension "acspl" is now active!');
   context.subscriptions.push(
     vscode.commands.registerCommand("acspl.helloWorld", () => {
-       vscode.window.showInformationMessage("Hello World from acspl!");
+       vscode.window.showInformationMessage("Hello World from acspl1!");
     })
   );
 
   context.subscriptions.push(
-	vscode.commands.registerCommand("ascpl.askQuestion",()=>{
+	vscode.commands.registerCommand("acspl.askQuestion",()=>{
 		vscode.window.showInformationMessage(
-			"how was your day?",
-			"good",
-			"bad")
+      "how was your day?",
+      "good",
+      "bad");
 	})
-  )
-}
+  );
+
+}//end of activate
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
