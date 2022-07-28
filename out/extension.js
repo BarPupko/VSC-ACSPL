@@ -9,12 +9,17 @@ const vscode = require("vscode");
 function activate(context) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "acspl" is now active!');
     context.subscriptions.push(vscode.commands.registerCommand("acspl.helloWorld", () => {
         vscode.window.showInformationMessage("Hello World from acspl1!");
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("acspl.askQuestion", () => {
-        vscode.window.showInformationMessage("how was your day?", "good", "bad");
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.askQuestion", async () => {
+        const answer = await vscode.window.showInformationMessage("how was your day?", "good", "bad");
+        if (answer === "bad") {
+            vscode.window.showInformationMessage("sorry to hear that");
+        }
+        else {
+            vscode.window.showInformationMessage("great to hear :)");
+        }
     }));
 } //end of activate
 exports.activate = activate;
