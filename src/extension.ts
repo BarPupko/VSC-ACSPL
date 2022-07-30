@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+import * as os from "os";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -21,6 +22,8 @@ export function activate(context: vscode.ExtensionContext) {
       "no");
 
       if(answer === "no"){
+        const hostname = os.hostname;
+        
         vscode.window.showInformationMessage("sorry to hear that, you can address you problem to barpupco@gmail.com");
       }else{
         vscode.window.showInformationMessage("great to hear :)");
