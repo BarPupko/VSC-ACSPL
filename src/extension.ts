@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("acspl.OpenMMI", () => {
       // A simple pid lookup
       
-      psnode.lookup({pid : 3348 }, function(err, resultList ) {
+      psnode.lookup({psargs : "ACS.Framework.exe" }, function(err, resultList ) {
         if (err) {
           let err = "";
             vscode.window.showInformationMessage("Cant open MMI");
@@ -60,11 +60,26 @@ export function activate(context: vscode.ExtensionContext) {
   );  
   context.subscriptions.push(
     vscode.commands.registerCommand("acspl.OpenUserModeDrive", () => {
-      vscode.window.showInformationMessage("Opening UserModeDrive");
-      console.log("time left for program to start");
+      psnode.lookup({psargs : "ACSCSRV.exe" }, function(err, resultList ) {
+        if (err) {
+          let err = "";
+            vscode.window.showInformationMessage("Cant open UserModeDrive");
+            throw new Error( err );
+        }
+
+        var process = resultList[ 0 ];
+
+        if(process ){
+          vscode.window.showInformationMessage("Opening UMD-UserModeDrive");
+          console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
+          var UMD: execFile.ChildProcess = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"'); //open calculator
+          
+        }
+        else {
+          vscode.window.showInformationMessage("Can't Open User Mode Drive");
+        }
+      });   
       
-      
-      var MMI: execFile.ChildProcess = execFile.exec('"C:\Program Files (x86)\ACS Motion Control\SPiiPlus Runtime Kit\User Mode Driver\ACSCSRV.exe"'); //open calculator
     })
   
   );
