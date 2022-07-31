@@ -1,9 +1,19 @@
 # Change Log
 
-All notable changes to the "acspl" extension will be documented in this file.
+## [0.28.0] 
+- Adding the extension into market
+- Added a description about the extenstion.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.28.2] 
+### Added
+- Added a user snippet for the If, IfElse, Loop, While,ON...RE,Label initialization in the Axes tests.
+- After PTP, WHILE, and loop, coloring functions and integers.
+- All user-supplied custom variables and functions are colored.
+- A user snippets was added.
+- Include an ICON that recognizes the ACSPL language in VS Code..
 
-- Initial release
+## [0.28.3] 
+# Add new function:
+- function that Open MMI session.
+

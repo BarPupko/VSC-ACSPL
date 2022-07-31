@@ -14,62 +14,71 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:acspl.helloWorld",
     "onCommand:acspl.askQuestion",
-    "onCommand:extension.cscs.repl"
+    "onCommand:acspl.OpenMMI",
+    "onCommand:acspl.OpenUserModeDrive"
   ],
   "main": "./out/extension.js",
   "contributes": {
- "breakpoints": [
-    {
-    "language": "c"
-    }
- ],
-    "commands": [{
-        "command": "acspl.helloWorld",
-        "category": "ACSPL+",
-        "title": "Hello World"
-      },
+    "breakpoints": [
+      {
+        "language": "c"
+      }
+    ],
+    "commands": [
       {
         "command": "acspl.askQuestion",
         "category": "ACSPL+",
         "title": "askQuestion"
       },
       {
-        "command": "extenstion.cscs.repl",
-        "title": "CSCS REPL"
-      }
-
-    ],
-    "languages": [{
-      "id": "acsplext",
-      "aliases": [
-        "ascpl",
-        "acsplext"
-      ],
-      "icon": {
-        "light": "images/icon.png",
-        "dark": "images/icon.png"
+        "command": "acspl.OpenMMI",
+        "category": "ACSPL+",
+        "title": "Open MMI"
       },
-      "extensions": [
-        ".prg"
-      ],
-      "configuration": "./language-configuration.json"
-    }],
-    "snippets": [{
-      "language": "acsplext",
-      "path": "./syntaxes/acspl.code-snippets"
-    }],
-    "grammars": [{
-      "language": "acsplext",
-      "scopeName": "source.prg",
-      "path": "./syntaxes/acsplext.tmLanguage.json"
-    }],
-    "keybindings": [{
-      "command": "extension.cscs.repl",
-      "key": "ctrl+9",
-      "when": "editorTextFocus"
-    }]
+      {
+        "command": "acspl.OpenUserModeDrive",
+        "category": "ACSPL+",
+        "title": "Open User Mode Drive"
+      }
+    ],
+    "languages": [
+      {
+        "id": "acsplext",
+        "aliases": [
+          "ascpl",
+          "acsplext"
+        ],
+        "icon": {
+          "light": "images/icon.png",
+          "dark": "images/icon.png"
+        },
+        "extensions": [
+          ".prg"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "acsplext",
+        "path": "./syntaxes/acspl.code-snippets"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "acsplext",
+        "scopeName": "source.prg",
+        "path": "./syntaxes/acsplext.tmLanguage.json"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.cscs.repl",
+        "key": "ctrl+9",
+        "when": "editorTextFocus"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -79,18 +88,21 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
-
   "devDependencies": {
-    "@types/vscode": "^1.69.0",
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "16.x",
+    "@types/ps-node": "^0.1.1",
+    "@types/vscode": "^1.69.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
+    "@vscode/test-electron": "^2.1.5",
     "eslint": "^8.20.0",
     "glob": "^8.0.3",
     "mocha": "^10.0.0",
-    "typescript": "^4.7.4",
-    "@vscode/test-electron": "^2.1.5"
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "ps-node": "^0.1.6"
   }
 }
