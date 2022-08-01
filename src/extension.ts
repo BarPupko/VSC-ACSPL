@@ -3,8 +3,9 @@
 import * as vscode from "vscode";
 import * as os from "os";
 import * as execFile from "child_process";
-import * as process from "process";
-import * as psnode from "ps-node";
+import * as process from "process"; 
+import * as psnode from "ps-node"; //using to check if process is in work.
+import * as fs from "fs"; //check if file is exist in file system.
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,53 +33,48 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("acspl.OpenMMI", () => {
-      // A simple pid lookup
-      
-      psnode.lookup({psargs : "ACS.Framework.exe" }, function(err, resultList ) {
-        if (err) {
-          let err = "";
-            vscode.window.showInformationMessage("Cant open MMI");
-            throw new Error( err );
-        }
+     
+      const path = '"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"';
 
-        var process = resultList[ 0 ];
+      try{
+        if(fs.existsSync(path)){
+        //file exists
+        vscode.window.showInformationMessage("Opening MMI");
+        var MMI: execFile.ChildProcess = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"'); //open calculator
+      }else{
+        vscode.window.showInformationMessage("MMI does not exist");
 
-        if( process ){
-            vscode.window.showInformationMessage("Opening MMI");
-            console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
-        }
-        else {
-            console.log( 'No such process found!' );
-        }
-      });   
+      }
+      }catch (err){
+        vscode.window.showInformationMessage("MMI does not exist");
+        console.error(err);
+      }
 
       
-      var MMI: execFile.ChildProcess = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"'); //open calculator
     })
   
 
   );  
   context.subscriptions.push(
     vscode.commands.registerCommand("acspl.OpenUserModeDrive", () => {
-      psnode.lookup({psargs : "ACSCSRV.exe" }, function(err, resultList ) {
-        if (err) {
-          let err = "";
-            vscode.window.showInformationMessage("Cant open UserModeDrive");
-            throw new Error( err );
-        }
-
-        var process = resultList[ 0 ];
-
-        if(process ){
-          vscode.window.showInformationMessage("Opening UMD-UserModeDrive");
-          console.log( 'PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments );
-          var UMD: execFile.ChildProcess = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"'); //open calculator
+        const path = '"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"';
+        try{
+          if(fs.existsSync(path)){
+          //file exists
+          vscode.window.showInformationMessage("Opening User mode drive");
           
+          var UMD: execFile.ChildProcess = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"'); //open calculator
+        }else{
+          vscode.window.showInformationMessage("User mode drive does not exist");
         }
-        else {
-          vscode.window.showInformationMessage("Can't Open User Mode Drive");
+        }catch (err){
+          vscode.window.showInformationMessage("User mode drive does not exist");
+          console.error(err);
         }
-      });   
+
+        
+          
+       
       
     })
   
