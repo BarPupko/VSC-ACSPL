@@ -6,7 +6,6 @@ import * as execFile from "child_process";
 import * as process from "process"; 
 import * as psnode from "ps-node"; //using to check if process is in work.
 import * as fs from "fs"; //check if file is exist in file system.
-import foo = require('../node_modules/');
 
 
 // this method is called when your extension is activated
