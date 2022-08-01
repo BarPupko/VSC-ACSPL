@@ -6,7 +6,7 @@
 // PROJECT			:    SPiiPlus 
 // SUBSYSTEM		:    SPiiPlus C Library
 // FILE				:	 ACSC.h
-// VERSION			:    7.2.1.0 
+// VERSION			:    7.2.2.0 
 
 // OVERVIEW
 // ========
@@ -45,7 +45,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // General definitions
 //////////////////////////////////////////////////////////////////////////////////////////////////
-#define ACSC_VER					0x7020100
+#define ACSC_VER					0x7020200
 
 
 #define ACSC_MAXCHANNEL				10			//Maximum number of communication channels
@@ -2976,6 +2976,8 @@ extern "C" {
 	int _ACSCLIB_ WINAPI acsc_DownloadFileOverEtherCAT(HANDLE Handle, char* Path, char* Filename, int SlaveIndex, ACSC_WAITBLOCK* Wait);
 	int _ACSCLIB_ WINAPI acsc_ReadSDOValueOverEtherCAT(HANDLE Handle, int Flags, int SlaveIndex, int Index, int SubIndex, double* Value, ACSC_WAITBLOCK* Wait);
 	int _ACSCLIB_ WINAPI acsc_WriteSDOValueOverEtherCAT(HANDLE Handle, int Flags, int SlaveIndex, int Index, int SubIndex, double Value, ACSC_WAITBLOCK* Wait);
+	int _ACSCLIB_ WINAPI acsc_GetEtherCATSlaveRegister(HANDLE Handle, int Flags, int SlaveIndex, int Offset, double* Value, ACSC_WAITBLOCK* Wait);
+	int _ACSCLIB_ WINAPI acsc_ClearEtherCATSlaveRegister(HANDLE Handle, int Flags, int SlaveIndex, int Offset, ACSC_WAITBLOCK* Wait);
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// These functions returns RAM / Flash Information                                    //
@@ -3365,6 +3367,8 @@ extern "C" {
 	typedef HANDLE(WINAPI *ACSC_DownloadFileOverEtherCAT)(HANDLE Handle, char* Path, char* Filename, int SlaveIndex, ACSC_WAITBLOCK* Wait);
 	typedef HANDLE(WINAPI *ACSC_ReadSDOValueOverEtherCAT)(HANDLE Handle, int Flags, int SlaveIndex, int Index, int SubIndex, double* Value, ACSC_WAITBLOCK* Wait);
 	typedef HANDLE(WINAPI *ACSC_WriteSDOValueOverEtherCAT)(HANDLE Handle, int Flags, int SlaveIndex, int Index, int SubIndex, double Value, ACSC_WAITBLOCK* Wait);
+	typedef HANDLE(WINAPI *ACSC_GetEtherCATSlaveRegister)(HANDLE Handle, int Flags, int SlaveIndex, int Offset, double* Value, ACSC_WAITBLOCK* Wait);
+	typedef HANDLE(WINAPI *ACSC_ClearEtherCATSlaveRegister)(HANDLE Handle, int Flags, int SlaveIndex, int Offset, ACSC_WAITBLOCK* Wait);
 
 	typedef int (WINAPI *ACSC_CopyFileToController)(HANDLE Handle, char* SourceFileName, char* DestinationFileName, ACSC_WAITBLOCK* Wait);
 	typedef int (WINAPI *ACSC_DeleteFileFromController)(HANDLE Handle, char* FileName, ACSC_WAITBLOCK* Wait);
@@ -3731,6 +3735,8 @@ extern "C" {
 	ACSC_DownloadFileOverEtherCAT			acsc_DownloadFileOverEtherCAT;
 	ACSC_ReadSDOValueOverEtherCAT			acsc_ReadSDOValueOverEtherCAT;
 	ACSC_WriteSDOValueOverEtherCAT			acsc_WriteSDOValueOverEtherCAT;
+	ACSC_GetEtherCATSlaveRegister           acsc_GetEtherCATSlaveRegister;
+	ACSC_ClearEtherCATSlaveRegister			acsc_ClearEtherCATSlaveRegister;
 
 	ACSC_CopyFileToController				acsc_CopyFileToController;
 	ACSC_DeleteFileFromController			acsc_DeleteFileFromController;
@@ -4154,6 +4160,8 @@ extern "C" {
 		acsc_GetEtherCATSlaveStateV2 = (ACSC_GetEtherCATSlaveStateV2)GetProcAddress(hACSCLibraryModule, "_acsc_GetEtherCATSlaveStateV2@20");					//     375
 		acsc_GetEtherCATSlaveOffsetV2 = (ACSC_GetEtherCATSlaveOffsetV2)GetProcAddress(hACSCLibraryModule, "_acsc_GetEtherCATSlaveOffsetV2@24");					//     376
 		acsc_GetEtherCATSlaveSerialNumber = (ACSC_GetEtherCATSlaveSerialNumber)GetProcAddress(hACSCLibraryModule, "_acsc_GetEtherCATSlaveSerialNumber@20");	    //     377
+		acsc_GetEtherCATSlaveRegister = (ACSC_GetEtherCATSlaveRegister)GetProcAddress(hACSCLibraryModule, "_acsc_GetEtherCATSlaveRegister@24");					//     378
+		acsc_ClearEtherCATSlaveRegister = (ACSC_ClearEtherCATSlaveRegister)GetProcAddress(hACSCLibraryModule, "_acsc_ClearEtherCATSlaveRegister@20");	        //     379
 
 		return 1;
 	}
@@ -4486,6 +4494,8 @@ extern "C" {
 	extern ACSC_DownloadFileOverEtherCAT		acsc_DownloadFileOverEtherCAT;
 	extern ACSC_ReadSDOValueOverEtherCAT		acsc_ReadSDOValueOverEtherCAT;
 	extern ACSC_WriteSDOValueOverEtherCAT		acsc_WriteSDOValueOverEtherCAT;
+	extern ACSC_GetEtherCATSlaveRegister		acsc_GetEtherCATSlaveRegister;
+	extern ACSC_ClearEtherCATSlaveRegister		acsc_ClearEtherCATSlaveRegister;
 
 	extern ACSC_CopyFileToController			acsc_CopyFileToController;
 	extern ACSC_DeleteFileFromController		acsc_DeleteFileFromController;
