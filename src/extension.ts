@@ -6,6 +6,8 @@ import * as execFile from "child_process";
 import * as process from "process"; 
 import * as psnode from "ps-node"; //using to check if process is in work.
 import * as fs from "fs"; //check if file is exist in file system.
+var b = require("../ACSC/ACSC.h");
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -37,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
       const path = '"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"';
 
       try{
-        if(fs.existsSync(path)){
+        if(!fs.existsSync(path)){
         //file exists
         vscode.window.showInformationMessage("Opening MMI");
         var MMI: execFile.ChildProcess = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"'); //open calculator
@@ -59,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("acspl.OpenUserModeDrive", () => {
         const path = '"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"';
         try{
-          if(fs.existsSync(path)){
+          if(!fs.existsSync(path)){
           //file exists
           vscode.window.showInformationMessage("Opening User mode drive");
           

@@ -23,7 +23,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand("acspl.OpenMMI", () => {
         const path = '"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"';
         try {
-            if (fs.existsSync(path)) {
+            if (!fs.existsSync(path)) {
                 //file exists
                 vscode.window.showInformationMessage("Opening MMI");
                 var MMI = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus ADK Suite v3.13 Alpha\\SPiiPlus MMI Application Studio\\ACS.Framework.exe"'); //open calculator
@@ -40,7 +40,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand("acspl.OpenUserModeDrive", () => {
         const path = '"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"';
         try {
-            if (fs.existsSync(path)) {
+            if (!fs.existsSync(path)) {
                 //file exists
                 vscode.window.showInformationMessage("Opening User mode drive");
                 var UMD = execFile.exec('"C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Runtime Kit\\User Mode Driver\\ACSCSRV.exe"'); //open calculator
