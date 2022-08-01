@@ -1,4 +1,4 @@
-![](/images/logoacs.svg "")
+![](/images/logoacs.png "")
 
 
 # For who this extenstion for?

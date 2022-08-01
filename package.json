@@ -5,7 +5,7 @@
   "publisher": "ACSPL",
   "creator": "BarP",
   "version": "0.28.2",
-  "icon": "images/logoacs.svg",
+  "icon": "images/logoacs.png",
   "engines": {
     "vscode": "^1.69.0"
   },
