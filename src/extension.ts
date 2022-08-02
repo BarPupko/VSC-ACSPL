@@ -7,7 +7,6 @@ import * as process from "process";
 import * as psnode from "ps-node"; //using to check if process is in work.
 import * as fs from "fs"; //check if file is exist in file system.
 
-var acsc_lib = require("../ACSC");
 
 
 const x = require("")
