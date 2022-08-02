@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "name": "math",
+  "description": "Simple math",
+  "main": "./index.js",
+  "engines": {
+    "node": ">= 7.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://somewhere.com/math"
+  },
+  "author": "@ndaidong",
+  "license": "MIT"
+}
