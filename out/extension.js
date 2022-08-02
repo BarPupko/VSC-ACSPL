@@ -6,6 +6,8 @@ exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 const execFile = require("child_process");
 const fs = require("fs"); //check if file is exist in file system.
+var acsc_lib = require("../ACSC");
+const x = require("");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
