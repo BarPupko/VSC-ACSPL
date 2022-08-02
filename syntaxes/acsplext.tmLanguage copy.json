@@ -244,7 +244,7 @@
 			"match": "(?i)(?<=send/)\\b([a-zA-Z]+?)\\b"
 		  },
 		  {
-			"name": "markup.italic.PathCmdOption.acspl",
+			"nam!e": "markup.italic.PathCmdOption.acspl",
 			"match": "(?i)(?<=path/)\\b([a-zA-Z]+?)\\b"
 		  },
 		  {

@@ -16,4 +16,7 @@
 ## [0.28.3] 
 # Add new function:
 - function that Open MMI session.
+- function that Open User Mode Driver.
+- C library for ACSPL+.
+- fixing bugs such as comment shortcut.
 
