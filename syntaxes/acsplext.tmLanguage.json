@@ -321,14 +321,17 @@
         "name": "constant.numeric.acspl",
         "match": "\\b/([A-Z])w+/g\\b"
         },
+       
         {
           "name": "entity.name.function.varaibles.acspl",
-          "match": "(?'int'[a-zA-z0-9])"
+          "match": "(?'int'[A-Za-z0-9_()]{7,})"
         },
+        
+        
        
 		{
 			"name": "markup.italic.display.acspl",
-			"match": "(?i)(?<=int/)\\b[a-zA-Z]\\b"
+			"match": "(?i)(?<=int/)\\b[a-zA-Z]{0,2}\\b"
 		  },
         {
           "name": "markup.italic.SendCmdOption.acspl",
