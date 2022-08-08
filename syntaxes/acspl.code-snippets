@@ -267,6 +267,9 @@
 		],
 		"description": "In acspl, float does not exist, changing the variable to real."
 	},
+
+	
+	
 	"double": {
 		"scope": "javascript,typescript,acsplext",
 		"prefix": "double",
@@ -275,6 +278,6 @@
 	
 		],
 		"description": "In acspl, double does not exist, changing the variable to real."
-	},
+	}
 	
 }
