@@ -4,7 +4,7 @@
   "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extenstion is for you.Good luck!",
   "publisher": "ACSPL",
   "creator": "BarP",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "icon": "images/logoacs.png",
   "engines": {
     "vscode": "^1.69.0"
