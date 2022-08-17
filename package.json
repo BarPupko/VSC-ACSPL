@@ -4,7 +4,7 @@
   "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extenstion is for you.Good luck!",
   "publisher": "ACSPL",
   "creator": "BarP",
-  "version": "0.28.2",
+  "version": "0.28.3",
   "icon": "images/logoacs.png",
   "engines": {
     "vscode": "^1.69.0"
@@ -25,8 +25,6 @@
         "language": "c"
       }
     ],
-
-
     "commands": [
       {
         "command": "acspl.askQuestion",
@@ -44,33 +42,29 @@
         "title": "Open User Mode Drive"
       }
     ],
-
-
     "languages": [
       {
-          "id": "acsplext",
-          "aliases": [
-              "ascpl",
-              "acsplext"
-          ],
-          "icon": {
-              "light": "images/icon.png",
-              "dark": "images/icon.png"
-          },
-          "extensions": [
-              ".prg"
-          ],
-          "configuration": "./language-configuration.json"
+        "id": "acsplext",
+        "aliases": [
+          "ascpl",
+          "acsplext"
+        ],
+        "icon": {
+          "light": "images/icon.png",
+          "dark": "images/icon.png"
+        },
+        "extensions": [
+          ".prg"
+        ],
+        "configuration": "./language-configuration.json"
       }
     ],
     "snippets": [
       {
         "language": "acsplext",
         "path": "./syntaxes/acspl.code-snippets"
-    }
-],
-
-
+      }
+    ],
     "grammars": [
       {
         "language": "acsplext",
@@ -78,8 +72,6 @@
         "path": "./syntaxes/acsplext.tmLanguage.json"
       }
     ],
-
-    
     "keybindings": [
       {
         "command": "acspl.OpenMMI",
