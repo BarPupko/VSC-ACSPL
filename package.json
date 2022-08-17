@@ -25,6 +25,8 @@
         "language": "c"
       }
     ],
+
+
     "commands": [
       {
         "command": "acspl.askQuestion",
@@ -42,6 +44,8 @@
         "title": "Open User Mode Drive"
       }
     ],
+
+
     "languages": [
       {
           "id": "acsplext",
@@ -58,13 +62,15 @@
           ],
           "configuration": "./language-configuration.json"
       }
-  ],
+    ],
     "snippets": [
       {
         "language": "acsplext",
         "path": "./syntaxes/acspl.code-snippets"
-      }
-    ],
+    }
+],
+
+
     "grammars": [
       {
         "language": "acsplext",
@@ -72,6 +78,8 @@
         "path": "./syntaxes/acsplext.tmLanguage.json"
       }
     ],
+
+    
     "keybindings": [
       {
         "command": "acspl.OpenMMI",
@@ -103,11 +111,6 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "gcc": "^1.0.2",
-    "gcc-min": "^7.3.0",
-    "node-addon-api": "^5.0.0",
-    "ps-node": "^0.1.6",
-    "source-map-loader": "^4.0.0",
-    "ts-loader": "^9.3.1"
+    "ps-node": "^0.1.6"
   }
 }
