@@ -1,4 +1,4 @@
-![LOGO](https://imgur.com/usLUB7r "")
+![LOGO](https://i.imgur.com/usLUB7r.png "")
 
 
 # For who this extenstion for?
