@@ -44,21 +44,21 @@
     ],
     "languages": [
       {
-        "id": "acsplext",
-        "aliases": [
-          "ascpl",
-          "acsplext"
-        ],
-        "icon": {
-          "light": "images/icon.png",
-          "dark": "images/icon.png"
-        },
-        "extensions": [
-          ".prg"
-        ],
-        "configuration": "./syntaxes/language-configuration.json"
+          "id": "acsplext",
+          "aliases": [
+              "ascpl",
+              "acsplext"
+          ],
+          "icon": {
+              "light": "images/icon.png",
+              "dark": "images/icon.png"
+          },
+          "extensions": [
+              ".prg"
+          ],
+          "configuration": "./language-configuration.json"
       }
-    ],
+  ],
     "snippets": [
       {
         "language": "acsplext",
