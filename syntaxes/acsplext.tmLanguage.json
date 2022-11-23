@@ -172,6 +172,10 @@
         {
           "name": "variable.language.DPM.acspl",
           "match": "\\.\\b(vraiable_value|variable_abs_value|measured_abs_value|sampled_value|measurement_status|measurement_type|sample_set_size|when_to_measure|sampling_time|sampling_type|sample_counter|peak_value|moving_average_value|std_dev_value|rms_value|during_motion|during_accel|during_decel|during_cv|selected_axis|on_off)\\b"
+        },
+        {
+          "name": "variable.language.Miscellaneous.acspl",
+          "match": "\\b(G00|G01|G02|G03|G04)\\b"
         }
       ]
     },

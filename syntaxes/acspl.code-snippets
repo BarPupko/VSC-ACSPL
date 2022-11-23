@@ -15,6 +15,16 @@
 		],
 		"description": "LOOP COMMAND"
 	},
+	"Loop fix": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "FOR",
+		"body": [
+			"LOOP $1",
+            "$2",
+			"END"
+		],
+		"description": "There is no FOR , only 'loop'"
+	},
 	"while command": {
 		"scope": "javascript,typescript,acsplext",
 		"prefix": "WHILE",
