@@ -175,7 +175,7 @@
         },
         {
           "name": "variable.language.Miscellaneous.acspl",
-          "match": "\\b(G00|G01|G02|G03|G04)\\b"
+          "match": "\\b(G0[0-9])\\b"
         }
       ]
     },
