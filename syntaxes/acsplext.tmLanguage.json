@@ -30,7 +30,7 @@
       "patterns": [
         {
           "name": "keyword.control.Common.acsplext",
-          "match": "\\b(?i)(global|local|ref|int|real|struct|void)\\b"
+          "match": "\\b(?i)(global|static|local|ref|int|real|struct|void)\\b"
         },
         {
           "name": "keyword.control.AxisManagement.acspl",
@@ -175,7 +175,9 @@
         },
         {
           "name": "variable.language.Miscellaneous.acspl",
-          "match": "\\b(G0[0-9])\\b"
+          "match": "\\b(?i)(G100|G[0-9][0-9])\\b"
+
+
         }
       ]
     },
@@ -348,6 +350,10 @@
         {
           "name": "markup.italic.PtpCmdOption.acspl",
           "match": "(?i)(?<=ptp/)\\b([a-zA-Z]+?)\\b"
+        },
+        {
+          "name": "markup.italic.WaitCmdOption.acspl",
+          "match": "(?i)(WAIT|[0-9])\\b"
         },
         {
           "name": "markup.italic.SprtCmdOption.acspl",
