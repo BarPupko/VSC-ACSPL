@@ -24,6 +24,7 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 * High-level program flow commands: IF-ELSE, WHILE, LOOP, GOTO
 * Object-oriented structures: STRUCT
 * User defined functions, subroutines, autoroutines
+* USING G-CODE
 
 
 # An exmaple code to work with
@@ -44,7 +45,7 @@ STOP
 ```
 
 
-```acspl
+```c
  int x = 0 
  ENABLE(x)
  
@@ -59,4 +60,5 @@ STOP
  STOP
 ```
 
-![Example of code from vscode to MMI](https://media0.giphy.com/media/wWKSgsPk6Rqiu8wIEa/giphy.gif?cid=790b7611e7adbebd7a55abe7968f461f6de150e1df5f1fd4&rid=giphy.gif&ct=g  "ACSPL Highlighter")
+
+![Example of code from vscode to MMI](https://im.ezgif.com/tmp/ezgif-1-9594041c99.gif  "ACSPL Highlighter")
