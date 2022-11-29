@@ -62,3 +62,6 @@ STOP
 
 
 ![Example of code from vscode to MMI](https://im.ezgif.com/tmp/ezgif-1-9594041c99.gif  "ACSPL Highlighter")
+
+
+© BAR POPKO 2022 ©
