@@ -187,6 +187,33 @@
 		],
 		"description": "enable_3_axis"
 	},
+	////////////////////////////////////////////////////////////",
+	////////////                               /////////////////",
+	////////////        G-CODE	      		   /////////////////",
+	////////////                               /////////////////",
+	////////////////////////////////////////////////////////////",
+	////////////////////////////////////////////////////////////",
+
+	"In acspl, you can use G CODE G0-9.": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "G-Code 1 Digit",
+		"body": [
+			"G-0$1",
+	
+		],
+		"description": "In acspl, you can use G CODE G0-9."
+	},
+
+	"In acspl, you can use G CODE G01-99.": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "G-Code 2 Digit",
+		"body": [
+			"G-$0$1",
+	
+		],
+		"description": "In acspl, you can use G CODE G01-99."
+	},
+
 
 	////////////////////////////////////////////////////////////",
 	////////////                               /////////////////",
