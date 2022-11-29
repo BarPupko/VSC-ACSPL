@@ -24,7 +24,7 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 * High-level program flow commands: IF-ELSE, WHILE, LOOP, GOTO
 * Object-oriented structures: STRUCT
 * User defined functions, subroutines, autoroutines
-* USING G-CODE
+* 💥🆕 USING G-CODE 🆕💥
 
 
 # An exmaple code to work with
