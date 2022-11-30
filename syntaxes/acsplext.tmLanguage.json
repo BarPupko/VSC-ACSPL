@@ -176,9 +176,17 @@
         {
           "name": "variable.language.Miscellaneous.acspl",
           "match": "\\b(?i)(G100|G[0-9][0-9])\\b"
-
-
+        },
+        {
+          "name": "variable.language.Miscellaneous.acspl",
+          "match": "\\b(?i)(V|V[0-9][0-9]|V[0-9])\\b"
+        },
+       
+        {
+          "name": "variable.language.Miscellaneous.acspl",
+          "match": "\\b(?i)(I|I[0-9][0-9]|I[0-9])\\b"
         }
+        
       ]
     },
 
