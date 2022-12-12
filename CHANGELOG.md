@@ -1,10 +1,5 @@
 # Change Log
 
-## [0.28.0] 
-- Adding the extension into market
-- Added a description about the extenstion.
-
-
 ## [0.28.2] 
 ### Added
 - Added a user snippet for the If, IfElse, Loop, While,ON...RE,Label initialization in the Axes tests.
@@ -19,4 +14,9 @@
 - function that Open User Mode Driver.
 - C library for ACSPL+.
 - fixing bugs such as comment shortcut.
+
+## [0.28.8] 
+# Add new function:
+- Adding new snippet code. 
+- Now you can use G-CODE.💥
 
