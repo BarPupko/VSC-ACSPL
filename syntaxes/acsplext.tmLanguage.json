@@ -411,7 +411,7 @@
     },
     "comments": {
       "name": "comment.line.character.acspl",
-      "begin": "!|^#",
+      "begin": "!",
       "end": "\\n"
     }
   },
