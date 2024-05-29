@@ -61,7 +61,6 @@ STOP
 ```
 
 
-![Example of code from vscode to MMI](https://s9.gifyu.com/images/ExtenstionGIF.gif  "ACSPL Highlighter")
 
 
 @BarPupko
