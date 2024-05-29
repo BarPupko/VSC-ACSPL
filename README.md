@@ -3,7 +3,6 @@
 
 # For who this extenstion for?
 ![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333  "")
-![visitors](https://visitor-badge.glitch.me/badge?page_id=VSC-ACSPL&left_color=blue&right_color=grey)
 
 
 People who work with **ACSPL+** but want to have a highlight language.
