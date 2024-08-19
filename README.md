@@ -13,7 +13,8 @@ therefor this is a great tool to help you write a better code.
 # What is ACSPL+ Programming Language?
 ACS motion controllers run on ACSPL+, a real-time motion programming language whose unique level of flexibility enables machine developers to quickly realize rich functionality.
 
-
+> **Note**
+> If you're having trouble with the packages please submit me an email barp@acsmotioncontrol.com
 
 # Key Features and Advantages
 * Markup Language that has all key factors.
@@ -28,7 +29,7 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 
 # An exmaple code to work with
 ### THE CODE:
-```JAVA
+```bash
  ENABLE(0)
  !functions decleration
  STRING(30) concat(String REF s1, String REF s2);
@@ -44,7 +45,7 @@ STOP
 ```
 
 
-```JAVA
+```bash
  int x = 0 
  ENABLE(x)
  
