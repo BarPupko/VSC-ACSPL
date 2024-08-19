@@ -59,7 +59,8 @@ STOP
  STOP
 ```
 
+![Example of code from vscode to MMI](images/logoacs.png  "ACSPL Highlighter")
 
 
 
-@BarPupko
+@Bar Popko
