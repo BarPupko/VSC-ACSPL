@@ -20,8 +20,6 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 > If you're having trouble with the packages please submit me an email barp@acsmotioncontrol.com
 
 
-
-
 # Key Features and Advantages
 * Markup Language that has all key factors.
 * Function refernce.
@@ -67,6 +65,9 @@ STOP
  PTP/vr x,500,5000
  STOP
 ```
+# Interaction between VSCODE(ACSPL+ Extention) and MMI
+
+![Example of code from vscode to MMI](images/logoacs.png  "ACSPL Highlighter")
 
 ![Example of code from vscode to MMI](images/logoacs.png  "ACSPL Highlighter")
 
