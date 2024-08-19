@@ -3,8 +3,8 @@
   "displayName": "ACS-Motion-Control",
   "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extenstion is for you.Good luck!",
   "publisher": "ACSPL",
-  "creator": "BarP",
-  "version": "0.28.9",
+  "creator": "BarPopko",
+  "version": "0.28.2",
   "icon": "images/logoacs.png",
   "engines": {
     "vscode": "^1.69.0"
@@ -16,7 +16,11 @@
   "activationEvents": [
     "onCommand:acspl.askQuestion",
     "onCommand:acspl.OpenMMI",
-    "onCommand:acspl.OpenUserModeDrive"
+    "onCommand:acspl.OpenUserModeDrive",
+    "onCommand:acspl.OpenUpdateCenter",
+    "onCommand:acspl.OpenSoftwareGuides"
+    
+
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -40,7 +44,35 @@
         "command": "acspl.OpenUserModeDrive",
         "category": "ACSPL+",
         "title": "Open User Mode Drive"
+      },
+      {
+        "command": "acspl.OpenKnowledgeCenter",
+        "category": "ACSPL+",
+        "title": "Open Knowledge Center"
+      },
+      {
+        "command": "acspl.OpenSoftwareGuides",
+        "category": "ACSPL+",
+        "title": "Open Software Guides folder"
+      },
+      {
+        "command": "acspl.JoinUs",
+        "category": "ACSPL+",
+        "title": "Join The ACS Team"
+      },
+      {
+        "command": "acspl.OpenTutorialVideos",
+        "category": "ACSPL+",
+        "title": "Open Update Center"
+      },
+      {
+        "command": "acspl.OpenLinkedIn",
+        "category": "ACSPL+",
+        "title": "OpenLinkedIn"
       }
+
+
+
     ],
     "languages": [
       {
@@ -56,7 +88,7 @@
         "extensions": [
           ".prg"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./syntaxes/language-configuration.json"
       }
     ],
     "snippets": [
@@ -77,6 +109,11 @@
         "command": "acspl.OpenMMI",
         "key": "ctrl+9",
         "when": "editorTextFocus"
+      },
+      {
+        "command": "acspl.OpenKnowledgeCenter",
+        "key": "ctrl+F1",
+        "when": "editorTextFocus"
       }
     ]
   },
@@ -91,7 +128,7 @@
   "devDependencies": {
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
-    "@types/node": "16.x",
+    "@types/node": "^16.18.105",
     "@types/ps-node": "^0.1.1",
     "@types/vscode": "^1.69.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
@@ -103,6 +140,11 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "ps-node": "^0.1.6"
+    "gcc": "^1.0.2",
+    "gcc-min": "^7.3.0",
+    "node-addon-api": "^5.0.0",
+    "ps-node": "^0.1.6",
+    "source-map-loader": "^4.0.0",
+    "ts-loader": "^9.3.1"
   }
 }
