@@ -1,13 +1,12 @@
 ![LOGO](https://i.imgur.com/usLUB7r.png "")
 
 
-# For who this extenstion for?
 ![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333  "")
 
 # What is ACSPL+ Programming Language?
 ACS motion controllers run on ACSPL+, a real-time motion programming language whose unique level of flexibility enables machine developers to quickly realize rich functionality.
 
-
+# For who this extenstion for?
 People who work with **ACSPL+** but want to have a highlight language.
 This Visual Studio Code extension is designed specifically for developers and engineers who work with ACSPL+—the programming language used in ACS Motion Control systems. While ACSPL+ is a powerful tool for controlling motion systems, writing code directly within the MMI program can sometimes be cumbersome and prone to challenges.
 
