@@ -6,8 +6,11 @@
 
 
 People who work with **ACSPL+** but want to have a highlight language.
-this extenstion is dosent have any functionality,and only use to write and copy the function from the vs-code into the MMI program.
-therefor this is a great tool to help you write a better code.
+This Visual Studio Code extension is designed specifically for developers and engineers who work with ACSPL+—the programming language used in ACS Motion Control systems. While ACSPL+ is a powerful tool for controlling motion systems, writing code directly within the MMI program can sometimes be cumbersome and prone to challenges.
+
+One of the common issues developers face when coding directly in MMI is the risk of disconnection from the controllers. This can happen due to network instability, hardware issues, or other unforeseen circumstances, leading to lost progress or interruptions in your workflow. Additionally, it can be easy to forget to save your work to the controller or simulator, especially when you're focused on debugging or making quick adjustments. These situations not only slow down the development process but can also lead to errors and inefficiencies.
+
+This extension aims to enhance your coding experience by providing syntax highlighting for ACSPL+ within Visual Studio Code, making your code more readable and easier to manage. By allowing you to work in a stable, feature-rich environment like VS Code, this extension helps mitigate the risks of losing your work due to disconnections or unsaved changes, ensuring that your coding sessions are smoother and more productive.
 
 
 # What is ACSPL+ Programming Language?
