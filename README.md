@@ -29,7 +29,7 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 
 # An exmaple code to work with
 ### THE CODE:
-```c#
+```JAVA
  ENABLE(0)
  !functions decleration
  STRING(30) concat(String REF s1, String REF s2);
@@ -45,7 +45,7 @@ STOP
 ```
 
 
-```bash
+```JAVA
  int x = 0 
  ENABLE(x)
  
