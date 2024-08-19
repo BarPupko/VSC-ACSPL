@@ -33,7 +33,7 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 # An exmaple code to work with
 > **Note**
 > This extension is purely for code editing and does not interact directly with ACS Motion Control systems or provide debugging capabilities. Its primary purpose is to serve as a code editor for ACSPL+ with enhanced readability.
-### THE CODE:
+### Example Snippets:
 ```JAVA
  ENABLE(0)
  !functions decleration
