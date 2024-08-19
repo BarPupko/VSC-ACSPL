@@ -16,6 +16,9 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 > **Note**
 > If you're having trouble with the packages please submit me an email barp@acsmotioncontrol.com
 
+
+
+
 # Key Features and Advantages
 * Markup Language that has all key factors.
 * Function refernce.
@@ -28,6 +31,8 @@ ACS motion controllers run on ACSPL+, a real-time motion programming language wh
 
 
 # An exmaple code to work with
+> **Note**
+> This extension is purely for code editing and does not interact directly with ACS Motion Control systems or provide debugging capabilities. Its primary purpose is to serve as a code editor for ACSPL+ with enhanced readability.
 ### THE CODE:
 ```JAVA
  ENABLE(0)
