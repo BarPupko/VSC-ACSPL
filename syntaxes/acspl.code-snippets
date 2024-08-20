@@ -63,7 +63,7 @@
 		"scope": "javascript,typescript,acsplext",
 		"prefix": "Block Syntax",
 		"body": [
-			"BLOCK ",
+			"BLOCK !block runs all code until it's finished ",
             "$1",
 			"END"
 		],
@@ -86,8 +86,8 @@
 		"scope": "javascript,typescript,acsplext",
 		"prefix": "Label Syntax",
 		"body": [
-			"CALL calls a subroutine according to a specified label. All subroutines must begin with a label and",
-			"conclude with RET.",
+			"!CALL calls a subroutine according to a specified label. All subroutines must begin with a label and",
+			"!conclude with RET.",
 			"LABEL_$1: !label name" ,
             "   $2",
 			"RET"
@@ -98,7 +98,7 @@
 
 	"function": {
 		"scope": "javascript,typescript,acsplext",
-		"prefix": "function",
+		"prefix": "Function_1Parmeter",
 		"body": [
 			"${1|int,real,string|} function(${2|int,real,string|} ${3|ref, x |}){",
 			"$LINE_COMMENT code",
@@ -187,6 +187,19 @@
 		],
 		"description": "enable_3_axis"
 	},
+    "structEX": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "struct_example",
+		"body": [
+			"struct Example {",
+            " int arr(10);",
+            " int y;",
+            " int z;",
+        "}"
+            
+		],
+		"description": "enable_3_axis"
+	},
 	////////////////////////////////////////////////////////////",
 	////////////                               /////////////////",
 	////////////        G-CODE	      		   /////////////////",
@@ -223,37 +236,43 @@
 	////////////////////////////////////////////////////////////",
 	// Testing
     "testComment": {
-		"scope": "javascript,typescript,acsplext",
-		"prefix": "configTest",
-		"body": [
-			"!////////////////////////////////////////////////////////////",
-            "!////////////   Author : $1                 /////////////////",
-            "!////////////   Date:  00/00/2000           /////////////////",
-            "!////////////                               /////////////////",
-            "!////////////////////////////////////////////////////////////",
-            "!////////////////////////////////////////////////////////////",
-            "int Result = 1",
-            
-            "!Function Declaration",
-            "       ",
-            "       ",
-            "       ",
-            "       ",
-            "       ",
-            "       ",
-            "       ",
-            "!--Tests----Tests----Tests----Tests----Tests----Tests----Tests--",
-            "       ",
-            "       ",
-            "       ",
+    "scope": "javascript,typescript,acsplext",
+    "prefix": "configTest",
+    "body": [
+        "!////////////////////////////////////////////////////////////",
+        "!////////////   Author : ${1:Your Name}                 /////////////////",
+        "!////////////   Date:  ${CURRENT_MONTH}/${CURRENT_DATE}/${CURRENT_YEAR} ${CURRENT_HOUR}:${CURRENT_MINUTE}           /////////////////",
+        "!////////////   Description: $2                   /////////////////",
+        "!////////////   Parameters:                        /////////////////",
+        "!////////////   - Param1: Description              /////////////////",
+        "!////////////   - Param2: Description              /////////////////",
+        "!////////////   Returns:                           /////////////////",
+        "!////////////   - Description of return value      /////////////////",
+        "!////////////////////////////////////////////////////////////",
+        "!////////////////////////////////////////////////////////////",
+        "int Result = 1",
+        
+        "!Function Declaration",
+        "       ",
+        "       ",
+        "       ",
+        "       ",
+        "       ",
+        "       ",
+        "       ",
+        "!--Tests----Tests----Tests----Tests----Tests----Tests----Tests--",
+        "       ",
+        "       ",
+        "       ",
+        "!////////////////////////////////////////////////////////////",
+        "!////////////   TODO:                                       /////////////////",
+        "!////////////   - [ ] Task 1                                /////////////////",
+        "!////////////   - [ ] Task 2                                /////////////////",
+        "STOP"
+    ],
+    "description": "ACSPL Code, with comments and test cases"
+},
 
-            "STOP"
-            
-
-            
-		],
-		"description": "testComment"
-	},
 
 
 	// Fast Function to configure stage:
@@ -293,7 +312,7 @@
 
             
 		],
-		"description": "testComment"
+		"description": "Basic Stage configuration"
 	},
 	"float": {
 		"scope": "javascript,typescript,acsplext",
@@ -315,6 +334,71 @@
 	
 		],
 		"description": "In acspl, double does not exist, changing the variable to real."
-	}
+	},
+	"Global REAL": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "Global Real",
+		"body": [
+			"Real is a keyword which designates the 64 bit float primitive type.",
+			"Global REAL myReal  = 3.14",
 	
+		],
+		"description": "Global Real , with PI."
+	},
+
+
+	"secretCommands": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "Secret",
+		"body": [
+			"NOTHING SECRET HERE",
+	
+		],
+		"description": ""
+		
+	},
+
+	"1D_Array": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "1D String array",
+		"body": [
+			"!str1 is an array of characters so we will need to use numbers inside the bracket,",
+			"to say how many characters we want to use.",
+			"String str1(10) = (“Hello from ACS”)"
+	
+		],
+		"description": "Variable array that store strings."
+		
+	},
+	"2D_Array": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "2Darray",
+		"body": [
+			"!arr1 is a 2D array with 12 rows and 4 columns.",
+			"Global INT arr1(11)(3)"
+	
+		],
+		"description": "Variable array that store strings."
+		
+	},
+	"Switch": {
+    "scope": "javascript,typescript,acsplext",
+    "prefix": "Switch",
+    "body": [
+        "int intVar = 23",
+        "SWITCH(intVar - 2)",
+        "       CASE 20:",
+        "              DISP \"CASE 20\"",
+        "              END;  !break",
+        "       CASE 21: !comment",
+        "              DISP \"CASE 21\"",
+        "             !no break",
+        "       DEFAULT:",
+        "             DISP \"DEFAULT\"",
+        "             END  !ending default",
+        "END !ending switch",
+        "STOP"
+    ],
+    "description": "testComment"
+}
 }

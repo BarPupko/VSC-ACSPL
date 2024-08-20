@@ -20,3 +20,9 @@
 - Adding new snippet code. 
 - Now you can use G-CODE.💥
 
+## [0.29.0]
+# Add new function:
+- fixing bugs - such as comment, and more.
+- a lot of new commands
+- you can now access MMI Through the Extension using CTRL+9
+- add new snippets code,
