@@ -44,27 +44,30 @@ String(254) concat(String REF s1, String REF s2);
 String(50) concat_return(String REF s1, String REF s2);
 
 !Code1
+!Function Declarations
+void concat(String REF s1, String REF s2, String REF s3);
+String(50) concat_return(String REF s1, String REF s2);
+ 
+!Code1
 String st1(10) = "hello";
 String st2(10) = "world";
 String st3(20);
-st3 = concat(st1, st2);
+concat(st1, st2, st3);
 disp(st3);
-
+ 
 STOP;
-
+ 
 !Function Implementations
-String(254) concat(String REF s1, String REF s2)
+void concat(String REF s1, String REF s2, String REF s3)
 {
-	String s3(254) = "";
 	s3 = s1 + s2;
-	ret s3;
+	ret
 }
-
+ 
 String(50) concat_return(String REF s1, String REF s2)
 {
 	ret s1 + s2;
 }
-
 ```
 
 
