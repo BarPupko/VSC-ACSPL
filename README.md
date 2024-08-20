@@ -39,18 +39,32 @@ Ideal for Motion Control Engineers: Whether you're developing new motion control
 > This extension is purely for code editing and does not interact directly with ACS Motion Control systems or provide debugging capabilities. Its primary purpose is to serve as a code editor for ACSPL+ with enhanced readability.
 ### Example Snippets:
 ```JAVA
- ENABLE(0)
- !functions decleration
- STRING(30) concat(String REF s1, String REF s2);
- String(50) concat_return(String REF s1,String REF s2);
- 
- !Code1
- string st1(10)="hello"
- string st2(10)="world"
- string st3(10)
- st3=concat(s1,s2);
- 
-STOP
+!Function Declarations
+String(254) concat(String REF s1, String REF s2);
+String(50) concat_return(String REF s1, String REF s2);
+
+!Code1
+String st1(10) = "hello";
+String st2(10) = "world";
+String st3(20);
+st3 = concat(st1, st2);
+disp(st3);
+
+STOP;
+
+!Function Implementations
+String(254) concat(String REF s1, String REF s2)
+{
+	String s3(254) = "";
+	s3 = s1 + s2;
+	ret s3;
+}
+
+String(50) concat_return(String REF s1, String REF s2)
+{
+	ret s1 + s2;
+}
+
 ```
 
 
