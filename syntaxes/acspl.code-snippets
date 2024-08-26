@@ -381,6 +381,46 @@
 		"description": "Variable array that store strings."
 		
 	},
+	"OR": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "OR",
+		"body": [
+			"|"
+	
+		],
+		"description": "Logical Operator |OR|."
+		
+	},
+	"NOT": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "NOT",
+		"body": [
+			"^"
+	
+		],
+		"description": "Logical Operator !NOT!."
+		
+	},
+	"XOR": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "XOR",
+		"body": [
+			"~"
+	
+		],
+		"description": "Logical Operator ~XOR~."
+		
+	},
+	"AND": {
+		"scope": "javascript,typescript,acsplext",
+		"prefix": "AND",
+		"body": [
+			"&"
+	
+		],
+		"description": "Logical Operator &AND&."
+		
+	},
 	"Switch": {
     "scope": "javascript,typescript,acsplext",
     "prefix": "Switch",
@@ -400,5 +440,6 @@
         "STOP"
     ],
     "description": "testComment"
+	
 }
 }
