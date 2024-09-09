@@ -2,6 +2,10 @@
 
 
 ![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333  "")
+![TypeScript](https://img.shields.io/badge/code-TypeScript-3178C6.svg?logo=typescript&style=flat)
+![Visual Studio Code](https://img.shields.io/badge/editor-VSCode-007ACC.svg?logo=visual-studio-code)
+![Extension](https://img.shields.io/badge/extension-VSCode-007ACC.svg?logo=visual-studio-code)
+![Python](https://img.shields.io/badge/code-Python-3776AB.svg?logo=python&style=flat)
 
 # What is ACSPL+ Programming Language?
 ACS motion controllers run on ACSPL+, a real-time motion programming language whose unique level of flexibility enables machine developers to quickly realize rich functionality.
