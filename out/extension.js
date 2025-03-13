@@ -153,25 +153,55 @@ function activate(context) {
             console.error(err);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("acspl.JoinUs", () => {
-        const careerUrl = "https://www.acsmotioncontrol.com/careers/careers-israel/?coref=1.10.r18_C01&t=1724072064619/";
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.JoinUs", async () => {
+        const selectedLocation = await vscode.window.showQuickPick(["ISRAEL", "CHINA", "GERMANY", "USA"], { placeHolder: "Select a location to view career opportunities" });
+        let careerUrl = "";
+        if (selectedLocation === "ISRAEL") {
+            careerUrl = "https://acsmotioncontrol.com/careers/careers-israel/?coref=1.10.r18_C01&t=1741869411841";
+        }
+        else if (selectedLocation === "CHINA") {
+            careerUrl = "https://www.acsmotioncontrol.com/careers/careers-china/";
+        }
+        else if (selectedLocation === "GERMANY") {
+            careerUrl = "https://www.acsmotioncontrol.com/careers/careers-germany/";
+        }
+        else if (selectedLocation === "USA") {
+            careerUrl = "https://www.acsmotioncontrol.com/careers/careers-usa/";
+        }
+        else {
+            vscode.window.showInformationMessage("No location selected.");
+            return; // Exit function if no selection is made
+        }
         try {
-            vscode.window.showInformationMessage("Opening Career Page - Join Us!");
+            vscode.window.showInformationMessage(`Opening Career Page - ${selectedLocation}`);
             vscode.env.openExternal(vscode.Uri.parse(careerUrl));
         }
         catch (err) {
-            vscode.window.showInformationMessage("An error occurred while trying to open the Career Page");
+            vscode.window.showErrorMessage("An error occurred while trying to open the Career Page.");
             console.error(err);
         }
     }));
     context.subscriptions.push(vscode.commands.registerCommand("acspl.OpenLinkedIn", () => {
-        const linkedInUrl = "https://www.linkedin.com/company/acs-motion-control/mycompany/";
+        const linkedInUrl = "https://www.linkedin.com/company/acs-motion-control/";
         try {
             vscode.window.showInformationMessage("Please Follow us on LinkedIn");
             vscode.env.openExternal(vscode.Uri.parse(linkedInUrl));
         }
         catch (err) {
             vscode.window.showErrorMessage("An error occurred while trying to open the LinkedIn page");
+            console.error(err);
+        }
+    }));
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.Developer Email", async () => {
+        try {
+            const subject = encodeURIComponent("Support Request: ACSPL+ Extension");
+            const body = encodeURIComponent("Hello Bar,\n\nI need assistance with the ACSPL+ extension.\n\nBest regards,\n[Your Name]");
+            const mailtoLink = `mailto:barp@acsmotioncontrol.com?subject=${subject}&body=${body}`;
+            vscode.env.openExternal(vscode.Uri.parse(mailtoLink));
+            vscode.window.showInformationMessage("Opening email client...");
+        }
+        catch (err) {
+            vscode.window.showErrorMessage("An error occurred while trying to open the email client.");
             console.error(err);
         }
     }));

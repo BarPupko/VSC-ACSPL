@@ -144,7 +144,7 @@
 		"body": [
 			"int x=1",
             "ENABLE(x)",
-            "cummut(x)"
+            "commut(x)"
             
 		],
 		"description": "enable_1_axis"
@@ -156,7 +156,7 @@
 			"int x=1",
             "int y=2",
             "ENABLE(x,y)",
-            "cummut(x,y)"
+            "commut(x,y)"
             
 		],
 		"description": "enable_2_axis"
@@ -169,7 +169,7 @@
             "int y=2",
             "int z=3",
             "ENABLE(x,y,z)",
-            "cummut(x,y,z)"
+            "commut(x,y,z)"
             
 		],
 		"description": "enable_3_axis"
@@ -239,7 +239,7 @@
     "scope": "javascript,typescript,acsplext",
     "prefix": "configTest",
     "body": [
-        "!////////////////////////////////////////////////////////////",
+        "!--////////////////////////////////////////////////////////////",
         "!////////////   Author : ${1:Your Name}                 /////////////////",
         "!////////////   Date:  ${CURRENT_MONTH}/${CURRENT_DATE}/${CURRENT_YEAR} ${CURRENT_HOUR}:${CURRENT_MINUTE}           /////////////////",
         "!////////////   Description: $2                   /////////////////",
@@ -280,7 +280,7 @@
 		"scope": "javascript,typescript,acsplext",
 		"prefix": "configStage",
 		"body": [
-			"!/////////////////////Stage Configuration/////////////////////",
+			"!--/////////////////////Stage Configuration/////////////////////",
            
             "!intialization",
             
@@ -295,7 +295,6 @@
 			"KDEC(X) = 10000                       ! Set kill deceleration",
 			
 			"IF MFLAGS(X).9 = 0",
-			"COMMUT X",
 			"WAIT 10",
 			"END",
 
