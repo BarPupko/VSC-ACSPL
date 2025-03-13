@@ -1,58 +1,55 @@
 ![LOGO](images/EXTLOGO.png "")
 
-
-![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333  "")
+![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333 "")
 ![TypeScript](https://img.shields.io/badge/code-TypeScript-3178C6.svg?logo=typescript&style=flat)
 ![Visual Studio Code](https://img.shields.io/badge/editor-VSCode-007ACC.svg?logo=visual-studio-code)
 ![Extension](https://img.shields.io/badge/extension-VSCode-007ACC.svg?logo=visual-studio-code)
 ![Python](https://img.shields.io/badge/code-Python-3776AB.svg?logo=python&style=flat)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Bar%20Popko-0A66C2?logo=linkedin)](https://www.linkedin.com/in/barpupko/)
 
 # What is ACSPL+ Programming Language?
-ACS motion controllers run on ACSPL+, a real-time motion programming language whose unique level of flexibility enables machine developers to quickly realize rich functionality.
+ACS motion controllers run on **ACSPL+**, a real-time motion programming language whose unique level of flexibility enables machine developers to quickly realize rich functionality.
 
-# For who this Extension for?
-People who work with **ACSPL+** but want to have a highlight language.
-This Visual Studio Code extension is designed specifically for developers and engineers who work with ACSPL+—the programming language used in ACS Motion Control systems. While ACSPL+ is a powerful tool for controlling motion systems, writing code directly within the MMI program can sometimes be cumbersome and prone to challenges.
+# Who is This Extension For?
+This Visual Studio Code extension is designed specifically for developers and engineers who work with **ACSPL+**—the programming language used in **ACS Motion Control** systems. While ACSPL+ is a powerful tool for controlling motion systems, writing code directly within the MMI program can sometimes be cumbersome and prone to challenges.
 
-One of the common issues developers face when coding directly in MMI is the risk of disconnection from the controllers. This can happen due to network instability, hardware issues, or other unforeseen circumstances, leading to lost progress or interruptions in your workflow. Additionally, it can be easy to forget to save your work to the controller or simulator, especially when you're focused on debugging or making quick adjustments. These situations not only slow down the development process but can also lead to errors and inefficiencies.
+One of the common issues developers face when coding directly in **MMI** is the risk of **disconnection** from the controllers. This can happen due to network instability, hardware issues, or other unforeseen circumstances, leading to lost progress or interruptions in your workflow. Additionally, it can be easy to forget to save your work to the controller or simulator, especially when you're focused on debugging or making quick adjustments. These situations not only slow down the development process but can also lead to errors and inefficiencies.
 
-This extension aims to enhance your coding experience by providing syntax highlighting for ACSPL+ within Visual Studio Code, making your code more readable and easier to manage. By allowing you to work in a stable, feature-rich environment like VS Code, this extension helps mitigate the risks of losing your work due to disconnections or unsaved changes, ensuring that your coding sessions are smoother and more productive.
+This extension aims to **enhance your coding experience** by providing **syntax highlighting** for ACSPL+ within **Visual Studio Code**, making your code more readable and easier to manage. By allowing you to work in a stable, feature-rich environment like **VS Code**, this extension helps mitigate the risks of losing your work due to disconnections or unsaved changes, ensuring that your coding sessions are smoother and more productive.
 
 # Why Use This Extension?
-Focused Tool for ACSPL+: If you frequently write ACSPL+ code and want a better environment than MMI alone can provide, this extension is for you. It’s a simple, focused tool that enhances your productivity by making your code more readable and easier to write.
-Ideal for Motion Control Engineers: Whether you're developing new motion control routines or maintaining existing ACSPL+ programs, this extension provides the clarity and efficiency you need.
+- **Focused Tool for ACSPL+**: If you frequently write **ACSPL+** code and want a better environment than **MMI** alone can provide, this extension is for you. It enhances your productivity by making your code more readable and easier to write.
+- **Ideal for Motion Control Engineers**: Whether you're developing new motion control routines or maintaining existing **ACSPL+** programs, this extension provides the clarity and efficiency you need.
 
-
-> **Note**
-> If you're having trouble with the packages please submit me an email barp@acsmotioncontrol.com
-
+> **Note**  
+> If you're having trouble with the packages, please email me at **barp@acsmotioncontrol.com** or barpupco@gmail.com
 
 # Key Features and Advantages
-* Markup Language that has all key factors.
-* Function refernce.
-* User can define any function and any variable he want.
-* Rich multi-axis motion command set
-* High-level program flow commands: IF-ELSE, WHILE, LOOP, GOTO
-* Object-oriented structures: STRUCT
-* User defined functions, subroutines, autoroutines
-* 💥🆕 USING G-CODE 🆕💥
+- **Syntax highlighting for ACSPL+**
+- **Function reference**
+- **User-defined functions and variables**
+- **Rich multi-axis motion command set**
+- **High-level program flow commands**: `IF-ELSE`, `WHILE`, `LOOP`, `GOTO`
+- **Object-oriented structures**: `STRUCT`
+- **User-defined functions, subroutines, and autoroutines**
+- 💥🆕 **Supports G-Code** 🆕💥
 
+# Example Code for ACSPL+
+> **Note**  
+> This extension is purely for code editing and does not interact directly with ACS Motion Control systems or provide debugging capabilities. Its primary purpose is to serve as a **code editor for ACSPL+** with enhanced readability.
 
-# An exmaple code to work with
-> **Note**
-> This extension is purely for code editing and does not interact directly with ACS Motion Control systems or provide debugging capabilities. Its primary purpose is to serve as a code editor for ACSPL+ with enhanced readability.
 ### Example Snippets:
-```JAVA
-!Function Declarations
+```java
+! Function Declarations
 String(254) concat(String REF s1, String REF s2);
 String(50) concat_return(String REF s1, String REF s2);
 
-!Code1
-!Function Declarations
+! Code1
+! Function Declarations
 void concat(String REF s1, String REF s2, String REF s3);
 String(50) concat_return(String REF s1, String REF s2);
  
-!Code1
+! Code1
 String st1(10) = "hello";
 String st2(10) = "world";
 String st3(20);
@@ -61,7 +58,7 @@ disp(st3);
  
 STOP;
  
-!Function Implementations
+! Function Implementations
 void concat(String REF s1, String REF s2, String REF s3)
 {
 	s3 = s1 + s2;
@@ -72,28 +69,29 @@ String(50) concat_return(String REF s1, String REF s2)
 {
 	ret s1 + s2;
 }
+
 ```
 
 
 ```JAVA
- int x = 0 
- ENABLE(x)
+int x = 0;
+ENABLE(x);
  
- VEL(x) = 3000
- SET FPOS(x)=0
- sctrigger 2
+VEL(x) = 3000;
+SET FPOS(x) = 0;
+sctrigger 2;
  
- PTP/x x,1000
- wait 500
- PTP/r x,500
- PTP/vr x,500,5000
- STOP
+PTP/x x, 1000;
+wait 500;
+PTP/r x, 500;
+PTP/vr x, 500, 5000;
+STOP;
+
 ```
 # Interaction between VSCODE(ACSPL+ Extention) and MMI
 
 ![Example of code from vscode to MMI](images/logoacs.png  "ACSPL Highlighter")
 
-![Example of code from vscode to MMI](images/logoacs.png  "ACSPL Highlighter")
 
 
 
