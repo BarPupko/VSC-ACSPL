@@ -20,12 +20,14 @@ interface ErrorConstructor {
  ------------------------------------------------*/
 
 // For backwards compability
-interface NodeRequire extends NodeJS.Require { }
-interface RequireResolve extends NodeJS.RequireResolve { }
-interface NodeModule extends NodeJS.Module { }
+interface NodeRequire extends NodeJS.Require {}
+interface RequireResolve extends NodeJS.RequireResolve {}
+interface NodeModule extends NodeJS.Module {}
 
 declare var process: NodeJS.Process;
 declare var console: Console;
+
+declare var global: typeof globalThis;
 
 declare var __filename: string;
 declare var __dirname: string;
@@ -41,7 +43,7 @@ declare var exports: any;
  */
 declare var gc: undefined | (() => void);
 
-//#region borrowed
+// #region borrowed
 // from https://github.com/microsoft/TypeScript/blob/38da7c600c83e7b31193a62495239a0fe478cb67/lib/lib.webworker.d.ts#L633 until moved to separate lib
 /** A controller object that allows you to abort one or more DOM requests as and when desired. */
 interface AbortController {
@@ -53,52 +55,34 @@ interface AbortController {
     /**
      * Invoking this method will set this object's AbortSignal's aborted flag and signal to any observers that the associated activity is to be aborted.
      */
-    abort(): void;
+    abort(reason?: any): void;
 }
 
 /** A signal object that allows you to communicate with a DOM request (such as a Fetch) and abort it if required via an AbortController object. */
-interface AbortSignal {
+interface AbortSignal extends EventTarget {
     /**
      * Returns true if this AbortSignal's AbortController has signaled to abort, and false otherwise.
      */
     readonly aborted: boolean;
+    readonly reason: any;
+    onabort: null | ((this: AbortSignal, event: Event) => any);
+    throwIfAborted(): void;
 }
 
-declare var AbortController: {
-    prototype: AbortController;
-    new(): AbortController;
-};
+declare var AbortController: typeof globalThis extends { onmessage: any; AbortController: infer T } ? T
+    : {
+        prototype: AbortController;
+        new(): AbortController;
+    };
 
-declare var AbortSignal: {
-    prototype: AbortSignal;
-    new(): AbortSignal;
-    // TODO: Add abort() static
-};
-//#endregion borrowed
-
-//#region ArrayLike.at()
-interface RelativeIndexable<T> {
-    /**
-     * Takes an integer value and returns the item at that index,
-     * allowing for positive and negative integers.
-     * Negative integers count back from the last item in the array.
-     */
-    at(index: number): T | undefined;
-}
-interface String extends RelativeIndexable<string> {}
-interface Array<T> extends RelativeIndexable<T> {}
-interface Int8Array extends RelativeIndexable<number> {}
-interface Uint8Array extends RelativeIndexable<number> {}
-interface Uint8ClampedArray extends RelativeIndexable<number> {}
-interface Int16Array extends RelativeIndexable<number> {}
-interface Uint16Array extends RelativeIndexable<number> {}
-interface Int32Array extends RelativeIndexable<number> {}
-interface Uint32Array extends RelativeIndexable<number> {}
-interface Float32Array extends RelativeIndexable<number> {}
-interface Float64Array extends RelativeIndexable<number> {}
-interface BigInt64Array extends RelativeIndexable<bigint> {}
-interface BigUint64Array extends RelativeIndexable<bigint> {}
-//#endregion ArrayLike.at() end
+declare var AbortSignal: typeof globalThis extends { onmessage: any; AbortSignal: infer T } ? T
+    : {
+        prototype: AbortSignal;
+        new(): AbortSignal;
+        abort(reason?: any): AbortSignal;
+        timeout(milliseconds: number): AbortSignal;
+    };
+// #endregion borrowed
 
 /*----------------------------------------------*
 *                                               *
@@ -141,7 +125,7 @@ declare namespace NodeJS {
         /**
          * Name of the script [if this function was defined in a script]
          */
-        getFileName(): string | null;
+        getFileName(): string | undefined;
 
         /**
          * Current line number [if this function was defined in a script]
@@ -194,11 +178,11 @@ declare namespace NodeJS {
         pause(): this;
         resume(): this;
         isPaused(): boolean;
-        pipe<T extends WritableStream>(destination: T, options?: { end?: boolean | undefined; }): T;
+        pipe<T extends WritableStream>(destination: T, options?: { end?: boolean | undefined }): T;
         unpipe(destination?: WritableStream): this;
         unshift(chunk: string | Uint8Array, encoding?: BufferEncoding): void;
         wrap(oldStream: ReadableStream): this;
-        [Symbol.asyncIterator](): AsyncIterableIterator<string | Buffer>;
+        [Symbol.asyncIterator](): NodeJS.AsyncIterator<string | Buffer>;
     }
 
     interface WritableStream extends EventEmitter {
@@ -210,26 +194,12 @@ declare namespace NodeJS {
         end(str: string, encoding?: BufferEncoding, cb?: () => void): void;
     }
 
-    interface ReadWriteStream extends ReadableStream, WritableStream { }
+    interface ReadWriteStream extends ReadableStream, WritableStream {}
 
     interface RefCounted {
         ref(): this;
         unref(): this;
     }
-
-    type TypedArray =
-        | Uint8Array
-        | Uint8ClampedArray
-        | Uint16Array
-        | Uint32Array
-        | Int8Array
-        | Int16Array
-        | Int32Array
-        | BigUint64Array
-        | BigInt64Array
-        | Float32Array
-        | Float64Array;
-    type ArrayBufferView = TypedArray | DataView;
 
     interface Require {
         (id: string): any;
@@ -243,14 +213,14 @@ declare namespace NodeJS {
     }
 
     interface RequireResolve {
-        (id: string, options?: { paths?: string[] | undefined; }): string;
+        (id: string, options?: { paths?: string[] | undefined }): string;
         paths(request: string): string[] | null;
     }
 
     interface RequireExtensions extends Dict<(m: Module, filename: string) => any> {
-        '.js': (m: Module, filename: string) => any;
-        '.json': (m: Module, filename: string) => any;
-        '.node': (m: Module, filename: string) => any;
+        ".js": (m: Module, filename: string) => any;
+        ".json": (m: Module, filename: string) => any;
+        ".node": (m: Module, filename: string) => any;
     }
     interface Module {
         /**
@@ -280,5 +250,17 @@ declare namespace NodeJS {
 
     interface ReadOnlyDict<T> {
         readonly [key: string]: T | undefined;
+    }
+
+    /** An iterable iterator returned by the Node.js API. */
+    // Default TReturn/TNext in v16 is `any`, for compatibility with the previously-used IterableIterator.
+    interface Iterator<T, TReturn = any, TNext = any> extends IteratorObject<T, TReturn, TNext> {
+        [Symbol.iterator](): NodeJS.Iterator<T, TReturn, TNext>;
+    }
+
+    /** An async iterable iterator returned by the Node.js API. */
+    // Default TReturn/TNext in v16 is `any`, for compatibility with the previously-used AsyncIterableIterator.
+    interface AsyncIterator<T, TReturn = any, TNext = any> extends AsyncIteratorObject<T, TReturn, TNext> {
+        [Symbol.asyncIterator](): NodeJS.AsyncIterator<T, TReturn, TNext>;
     }
 }

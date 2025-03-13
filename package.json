@@ -1,11 +1,15 @@
 {
   "name": "acsplext",
   "displayName": "ACS-Motion-Control",
-  "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extenstion is for you.Good luck!",
+  "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extension is for you. Good luck!",
   "publisher": "ACSPL",
   "creator": "BarPopko",
   "version": "0.29.0",
   "icon": "images/logoacs.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BarPupko/VSC-ACSPL"
+  },
   "engines": {
     "vscode": "^1.69.0"
   },
@@ -73,9 +77,6 @@
         "category": "ACSPL+",
         "title": "OpenLinkedIn"
       }
-
-
-
     ],
     "languages": [
       {
@@ -129,6 +130,7 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@types/estree": "^1.0.6",
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "^16.18.105",
