@@ -27,3 +27,6 @@
 - you can now access MMI Through the Extension using CTRL+9
 - add new snippets code
 - comment was fixed
+## [0.29.1]
+- **Fixed variable autocomplete issue**:
+
