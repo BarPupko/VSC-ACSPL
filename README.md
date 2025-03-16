@@ -1,4 +1,4 @@
-![LOGO]([https://imgur.com/KsdypyH](https://imgur.com/OYpdtil))
+![LOGO](https://i.imgur.com/OYpdtil.png)
 
 ![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333 "")
 ![TypeScript](https://img.shields.io/badge/code-TypeScript-3178C6.svg?logo=typescript&style=flat)
@@ -103,7 +103,7 @@ STOP;
 ```
 # Interaction between VSCODE(ACSPL+ Extention) and MMI
 
-![Example of code from vscode to MMI]([https://imgur.com/KsdypyH](https://imgur.com/KsdypyH) "ACSPL Highlighter")
+![Example of code from vscode to MMI](https://i.imgur.com/KsdypyH.gif "ACSPL Highlighter")
 
 
 
