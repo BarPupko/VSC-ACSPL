@@ -76,17 +76,17 @@ String(50) concat_return(String REF s1, String REF s2)
 | Simulator Code Snippet                       | Real Controller Code Snippet                    |
 |-----------------------------------------------|--------------------------------------------------|
 | ```JAVA                                     | ```JAVA                                         |
-| INT X = 0                                    | INT X = 0                                        |
-| ENABLE (X)                                   | ENABLE (X)                                       |
-|                                              |                                                  |
-| VEL(X) = 5000                                | VEL(X) = 3000                                    |
-| SET FPOS(X) = 0                              | SET FPOS(X) = 0                                  |
-|                                              |                                                  |
-| PTP/v X, 1000, 500                           | PTP/x X, 1000                                    |
-|                                              |                                                  |
-| WAIT 500                                     | WAIT 500                                         |
-| STOP                                         | STOP                                             |
-| ```                                           | ```
+ INT X = 0                                     INT X = 0                                        |
+ ENABLE (X)                                    ENABLE (X)                                       |
+                                                                                                |
+ VEL(X) = 5000                                 VEL(X) = 3000                                    |
+ SET FPOS(X) = 0                               SET FPOS(X) = 0                                  |
+                                                                                                |
+ PTP/v X, 1000, 500                            PTP/x X, 1000                                    |
+                                                                                                |
+ WAIT 500                                      WAIT 500                                         |
+ STOP                                          STOP                                             |
+ ```                                            ```
 # Interaction between VSCODE(ACSPL+ Extention) and MMI
 
 ![Example of code from vscode to MMI](/images/example.gif "ACSPL Highlighter")
