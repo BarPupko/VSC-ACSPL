@@ -1,4 +1,4 @@
-![LOGO](images/EXTLOGO.png "")
+![LOGO](https://lh3.google.com/u/0/d/1nJk7tEdHqxv33Fvnu1Dtx-BwsJn5Dr12=w1920-h911-iv1 "")
 
 ![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333 "")
 ![TypeScript](https://img.shields.io/badge/code-TypeScript-3178C6.svg?logo=typescript&style=flat)
@@ -15,10 +15,10 @@ This Visual Studio Code extension is designed specifically for developers and en
 
 One of the common issues developers face when coding directly in **MMI** is the risk of **disconnection** from the controllers. This can happen due to network instability, hardware issues, or other unforeseen circumstances, leading to lost progress or interruptions in your workflow. Additionally, it can be easy to forget to save your work to the controller or simulator, especially when you're focused on debugging or making quick adjustments. These situations not only slow down the development process but can also lead to errors and inefficiencies.
 
-This extension aims to **enhance your coding experience** by providing **syntax highlighting** for ACSPL+ within **Visual Studio Code**, making your code more readable and easier to manage. By allowing you to work in a stable, feature-rich environment like **VS Code**, this extension helps mitigate the risks of losing your work due to disconnections or unsaved changes, ensuring that your coding sessions are smoother and more productive.
+This extension aims to **enhance your coding experience** by providing **syntax highlighting** for ACSPL+ within **Visual Studio Code**, making your code more readable and easier to manage. By allowing you to work in a stable, feature-rich environment like **VS Code**, this extension helps avoid the risks of losing your work due to disconnections or unsaved changes, ensuring that your coding sessions are smoother and more productive.
 
 # Why Use This Extension?
-- **Focused Tool for ACSPL+**: If you frequently write **ACSPL+** code and want a better environment than **MMI** alone can provide, this extension is for you. It enhances your productivity by making your code more readable and easier to write.
+- **Focused Tool for ACSPL+**: If you frequently write **ACSPL+** code and want a another codding environment beside the **MMI**, this extension is for you. It enhances your productivity by making your code more readable and easier to write.
 - **Ideal for Motion Control Engineers**: Whether you're developing new motion control routines or maintaining existing **ACSPL+** programs, this extension provides the clarity and efficiency you need.
 
 > **Note**  
@@ -90,7 +90,7 @@ STOP;
 ```
 # Interaction between VSCODE(ACSPL+ Extention) and MMI
 
-![Example of code from vscode to MMI](images/example.gif "ACSPL Highlighter")
+![Example of code from vscode to MMI](https://lh3.google.com/u/0/d/1OhKCgW5zuTTSaD2yzGkFUU1KWaRjxi2s=w1920-h911-iv1 "ACSPL Highlighter")
 
 
 

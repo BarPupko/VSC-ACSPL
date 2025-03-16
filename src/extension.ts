@@ -7,10 +7,44 @@ import * as process from "process";
 import * as psNode from "ps-node"; // Using to check if process is in work.
 import * as fs from "fs"; // Check if file exists in file system.
 import * as path from 'path'; // Import path module to handle paths easily
+const legend = new vscode.SemanticTokensLegend(['variable', 'keyword', 'type'], []);
+class VariableCompletionProvider implements vscode.CompletionItemProvider {
+    provideCompletionItems(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+        context: vscode.CompletionContext
+    ): vscode.CompletionItem[] {
+
+        const text = document.getText();
+        const variables = extractVariables(text);
+
+        return variables.map(varName => {
+            const item = new vscode.CompletionItem(varName, vscode.CompletionItemKind.Variable);
+            item.detail = "Integer Variable";
+            return item;
+        });
+    }
+}
+
+function extractVariables(text: string): string[] {
+    const regex = /^\s*(?:unsigned\s+|signed\s+|long\s+|short\s+)?(?:int|REAL|char|void)\s+(\*?\s*\w+)(?:\s*\[.*\])?\s*(?:=.*)?;/gm;
+    const matches = [...text.matchAll(regex)];
+    return matches.map(match => match[1].replace('*', '').trim());
+}
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+
+    context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+            { language: 'acsplext' },
+            new VariableCompletionProvider(),
+            ' ', '\t', '=', '('  // Adjust triggers for your syntax
+        )
+    );
+
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
 
@@ -244,7 +278,7 @@ context.subscriptions.push(
 
 
 context.subscriptions.push(
-    vscode.commands.registerCommand("acspl.Developer Email", async () => {
+    vscode.commands.registerCommand("acspl.DeveloperEmail", async () => {
         try {
             const subject = encodeURIComponent("Support Request: ACSPL+ Extension");
             const body = encodeURIComponent("Hello Bar,\n\nI need assistance with the ACSPL+ extension.\n\nBest regards,\n[Your Name]");
@@ -258,6 +292,10 @@ context.subscriptions.push(
         }
     })
 );
+
+
+
+
 
 
 } // end of activate function

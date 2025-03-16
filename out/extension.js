@@ -7,9 +7,28 @@ const vscode = require("vscode");
 const execFile = require("child_process");
 const fs = require("fs"); // Check if file exists in file system.
 const path = require("path"); // Import path module to handle paths easily
+const legend = new vscode.SemanticTokensLegend(['variable', 'keyword', 'type'], []);
+class VariableCompletionProvider {
+    provideCompletionItems(document, position, token, context) {
+        const text = document.getText();
+        const variables = extractVariables(text);
+        return variables.map(varName => {
+            const item = new vscode.CompletionItem(varName, vscode.CompletionItemKind.Variable);
+            item.detail = "Integer Variable";
+            return item;
+        });
+    }
+}
+function extractVariables(text) {
+    const regex = /^\s*(?:unsigned\s+|signed\s+|long\s+|short\s+)?(?:int|REAL|char|void)\s+(\*?\s*\w+)(?:\s*\[.*\])?\s*(?:=.*)?;/gm;
+    const matches = [...text.matchAll(regex)];
+    return matches.map(match => match[1].replace('*', '').trim());
+}
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 function activate(context) {
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'acsplext' }, new VariableCompletionProvider(), ' ', '\t', '=', '(' // Adjust triggers for your syntax
+    ));
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     context.subscriptions.push(vscode.commands.registerCommand("acspl.askQuestion", async () => {
@@ -192,7 +211,7 @@ function activate(context) {
             console.error(err);
         }
     }));
-    context.subscriptions.push(vscode.commands.registerCommand("acspl.Developer Email", async () => {
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.DeveloperEmail", async () => {
         try {
             const subject = encodeURIComponent("Support Request: ACSPL+ Extension");
             const body = encodeURIComponent("Hello Bar,\n\nI need assistance with the ACSPL+ extension.\n\nBest regards,\n[Your Name]");

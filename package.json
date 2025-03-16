@@ -27,7 +27,7 @@
     "onCommand:acspl.OpenTutorialVideos",
     "onCommand:acspl.JoinUs",
     "onCommand:acspl.OpenLinkedIn",
-    "onCommand:acspl.Developer Email"
+    "onCommand:acspl.DeveloperEmail"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -36,6 +36,18 @@
         "language": "c"
       }
     ],
+    "contributes": {
+    "themes": [{
+        "label": "MyTheme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/my-theme.json"
+    }],
+    "semanticTokenColors": {
+        "variable": "#4FC1FF",
+        "keyword": "#FF00FF",
+        "type": "#9CDCFE"
+    }
+},
     "commands": [
       {
         "command": "acspl.askQuestion",
@@ -75,7 +87,12 @@
       {
         "command": "acspl.OpenLinkedIn",
         "category": "ACSPL+",
-        "title": "OpenLinkedIn"
+        "title": "Open LinkedIn"
+      },
+      {
+        "command": "acspl.DeveloperEmail",
+        "category": "ACSPL+",
+        "title": "Send email to the developer"
       }
     ],
     "languages": [
