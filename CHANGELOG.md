@@ -29,4 +29,6 @@
 - comment was fixed
 ## [0.29.1]
 - Fixed variable autocomplete issue.
+- New Commands
+- New Example Snippets
 
