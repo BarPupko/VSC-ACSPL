@@ -28,5 +28,5 @@
 - add new snippets code
 - comment was fixed
 ## [0.29.1]
-- **Fixed variable autocomplete issue**:
+- Fixed variable autocomplete issue.
 
