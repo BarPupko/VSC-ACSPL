@@ -75,7 +75,7 @@ String(50) concat_return(String REF s1, String REF s2)
 
 | Simulator Code Snippet                       | Real Controller Code Snippet                    |
 |-----------------------------------------------|--------------------------------------------------|
-| ```acspl                                     | ```acspl                                         |
+| ```JAVA                                     | ```JAVA                                         |
 | INT X = 0                                    | INT X = 0                                        |
 | ENABLE (X)                                   | ENABLE (X)                                       |
 |                                              |                                                  |
