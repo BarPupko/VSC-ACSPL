@@ -90,7 +90,7 @@ STOP;
 ```
 # Interaction between VSCODE(ACSPL+ Extention) and MMI
 
-![Example of code from vscode to MMI](https://drive.google.com/file/d/1OhKCgW5zuTTSaD2yzGkFUU1KWaRjxi2s/view?usp=sharing "ACSPL Highlighter")
+![Example of code from vscode to MMI](https://drive.google.com/uc?id=1OhKCgW5zuTTSaD2yzGkFUU1KWaRjxi2s "ACSPL Highlighter")
 
 
 
