@@ -1,4 +1,4 @@
-![LOGO](images/EXTLOGO.png)
+![LOGO](images/)
 
 ![](https://img.shields.io/visual-studio-marketplace/v/ACSPL.acsplext?color=FF3333&label=Version&logo=ver&logoColor=%23FF3333 "")
 ![TypeScript](https://img.shields.io/badge/code-TypeScript-3178C6.svg?logo=typescript&style=flat)
@@ -38,55 +38,69 @@ This extension aims to **enhance your coding experience** by providing **syntax 
 > **Note**  
 > This extension is purely for code editing and does not interact directly with ACS Motion Control systems or provide debugging capabilities. Its primary purpose is to serve as a **code editor for ACSPL+** with enhanced readability.
 
-### Example Snippets:
+### Real Controller & Simulator Example Snippets:
 ```java
-! Function Declarations
-String(254) concat(String REF s1, String REF s2);
-String(50) concat_return(String REF s1, String REF s2);
-
-! Code1
 ! Function Declarations
 void concat(String REF s1, String REF s2, String REF s3);
 String(50) concat_return(String REF s1, String REF s2);
- 
-! Code1
-String st1(10) = "hello";
-String st2(10) = "world";
-String st3(20);
+
+! Code Usage Example
+String st1(20) = "WELCOME TO ";
+String st2(10) = "ACSPL+";
+String st3(50);
+
 concat(st1, st2, st3);
 disp(st3);
- 
+
 STOP;
- 
+
 ! Function Implementations
 void concat(String REF s1, String REF s2, String REF s3)
 {
-	s3 = s1 + s2;
-	ret
+    s3 = s1 + s2;
+    ret
 }
- 
+
 String(50) concat_return(String REF s1, String REF s2)
 {
-	ret s1 + s2;
+    ret s1 + s2;
 }
 
 ```
+### Real Controller Example Snippets:
 
 
-| Simulator Code Snippet                       | Real Controller Code Snippet                    |
-|-----------------------------------------------|--------------------------------------------------|
-| ```JAVA                                     | ```JAVA                                         |
- INT X = 0                                     INT X = 0                                        |
- ENABLE (X)                                    ENABLE (X)                                       |
-                                                                                                |
- VEL(X) = 5000                                 VEL(X) = 3000                                    |
- SET FPOS(X) = 0                               SET FPOS(X) = 0                                  |
-                                                                                                |
- PTP/v X, 1000, 500                            PTP/x X, 1000                                    |
-                                                                                                |
- WAIT 500                                      WAIT 500                                         |
- STOP                                          STOP                                             |
- ```                                            ```
+```JAVA
+!--THE NEXT CODE VALUES IS DEPENDS ON YOUR STAGE !
+int x = 0;
+ENABLE(x);
+COMMUT(x);
+VEL(x) = 3000;
+SET FPOS(x) = 0;
+sctrigger 2;
+ 
+PTP/r x, 25;
+wait 500;
+PTP/r x, 25;
+PTP/vr x, 0, 25;
+STOP;
+```
+### Simulator Example Snippets:
+
+```JAVA
+!--THE NEXT CODE VALUES IS DEPENDS ON YOUR STAGE !
+int x = 0;
+ENABLE(x);
+VEL(x) = 3000;
+SET FPOS(x) = 0;
+sctrigger 2;
+ 
+PTP/r x, 25;
+wait 500;
+PTP/r x, 25;
+PTP/vr x, 0, 25;
+STOP;
+```
 # Interaction between VSCODE(ACSPL+ Extention) and MMI
 
 ![Example of code from vscode to MMI](/images/example.gif "ACSPL Highlighter")
