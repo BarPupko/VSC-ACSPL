@@ -32,6 +32,16 @@ function extractVariables(text: string): string[] {
     const matches = [...text.matchAll(regex)];
     return matches.map(match => match[1].replace('*', '').trim());
 }
+//When hovering over a function or variable, display documentation or usage examples.
+
+vscode.languages.registerHoverProvider('acsplext', {
+    provideHover(document, position, token) {
+      const word = document.getText(document.getWordRangeAtPosition(position));
+      if(word === 'VEL') {
+        return new vscode.Hover("`VEL(axis)` sets the velocity of the specified axis.\n\n**Example:**\n```acspl\nVEL(X) = 1000;\n```");
+      }
+    }
+  });
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
