@@ -54,15 +54,74 @@ let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
     // Listen for messages from the Webview
     panel.webview.onDidReceiveMessage(async (message) => {
         if (message.command === 'sendMessage') {
-            const userInput = message.text;
+        const userInput = message.text.toLowerCase();
+
+        // Check if user is searching for examples
+        if (userInput.includes('example') || userInput.includes('usage')) {
+            const searchResults = searchDocumentation(userInput);
+            panel.webview.postMessage({ 
+                command: 'receiveMessage', 
+                text: `🔍 **Searching documentation for examples...**<br><br>${searchResults}` 
+            });
+        } else {
+            // Regular AI processing
             const aiResponse = await getAIResponse(userInput);
             panel.webview.postMessage({ command: 'receiveMessage', text: aiResponse });
         }
-    });
+    }
+
+        
+    }
+
+
+);
 });
 
 
 
+function searchDocumentation(query: string): string {
+    const docFolder = "C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Documentation Kit\\Software Guides";
+
+    try {
+        // Get a list of all files inside the documentation folder
+        const files = fs.readdirSync(docFolder);
+
+        // Filter only `.pdf`, `.txt`, or `.html` files that may contain relevant info
+        const relevantFiles = files.filter(file => 
+            file.toLowerCase().endsWith('.pdf') || 
+            file.toLowerCase().endsWith('.txt') || 
+            file.toLowerCase().endsWith('.html')
+        );
+
+        if (relevantFiles.length === 0) {
+            return "⚠️ No relevant documentation found in the local folder.";
+        }
+
+         // Search for examples inside files
+         let foundExamples = "";
+         for (const file of relevantFiles) {
+             const filePath = path.join(docFolder, file);
+             const content = fs.readFileSync(filePath, 'utf8');
+ 
+             // Search for query inside the file
+             const regex = new RegExp(`.*${query}.*`, 'gi');
+             const matches = content.match(regex);
+ 
+             if (matches) {
+                 foundExamples += `📄 **From ${file}**:<br><pre><code>${matches.join("\n")}</code></pre><br>`;
+             }
+         }
+ 
+         if (!foundExamples) {
+             return "⚠️ No examples found in the documentation.";
+         }
+ 
+         return foundExamples;
+     } catch (error) {
+         console.error("Error accessing documentation folder:", error);
+         return "❌ **Error:** Unable to access documentation folder.";
+     }
+ }
 
 
 function extractVariables(text: string): string[] {
@@ -382,7 +441,6 @@ function formatAIResponse(response: string): string {
         .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Format generic code
         .replace(/\n/g, "<br>"); // Convert new lines to HTML <br> for spacing
 }
-// Function to generate Webview content (HTML + JavaScript)
 function getWebviewContent(): string {
     return `
     <!DOCTYPE html>
@@ -390,8 +448,7 @@ function getWebviewContent(): string {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <title> Monty - AI Assistant</title>
+        <title>Monty - AI Assistant</title>
         <style>
             body { 
                 font-family: Arial, sans-serif; 
@@ -438,7 +495,11 @@ function getWebviewContent(): string {
         <div id="header">
             <div style="display: flex; align-items: center;">
                 <img src="https://cdn-icons-png.flaticon.com/512/5511/5511666.png" alt="Monty Icon" />
-                <h2>  Monty - AI Chat</h2>
+                <h2>Monty - AI Chat</h2>
+                 <h3>Important Disclaimer:</h3>
+            <a href="#">Please be aware that the information provided here is based on an AI model. 
+            While I strive for accuracy, AI-generated content may contain errors. 
+            Always verify critical information with official documentation.</a>
             </div>
             <button id="clear-btn" onclick="clearChat()">Clear Chat</button>
         </div>
@@ -448,6 +509,12 @@ function getWebviewContent(): string {
         <div class="input-container">
             <textarea id="message" placeholder="Ask Monty..." onkeydown="handleKeyPress(event)"></textarea>
             <button onclick="sendMessage()">Send</button>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="input-container">
+            <input type="file" id="fileUpload">
+            <button onclick="uploadFile()">Upload File</button>
         </div>
 
         <script>
@@ -510,10 +577,29 @@ function getWebviewContent(): string {
                 }
             }
 
+            function uploadFile() {
+                const fileInput = document.getElementById('fileUpload');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('No file selected.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const fileContent = event.target.result;
+                    vscode.postMessage({ command: 'uploadFile', filename: file.name, content: fileContent });
+                };
+                reader.readAsText(file);
+            }
+
             loadChatHistory();
         </script>
     </body>
     </html>
     `;
 }
+
 export function deactivate() {}
+
