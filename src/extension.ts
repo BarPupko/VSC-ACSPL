@@ -47,7 +47,7 @@ let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
         vscode.ViewColumn.One, 
         { enableScripts: true, retainContextWhenHidden: true }
     );
-
+    
     // Load the initial HTML
     panel.webview.html = getWebviewContent();
 
@@ -392,7 +392,6 @@ function getWebviewContent(): string {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title> Monty - AI Assistant</title>
-
         <style>
             body { 
                 font-family: Arial, sans-serif; 
