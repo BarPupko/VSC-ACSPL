@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import * as os from "os";
+import axios from 'axios';
+
 import * as execFile from "child_process";
 import * as process from "process"; 
 import * as psNode from "ps-node"; // Using to check if process is in work.
@@ -26,6 +28,42 @@ class VariableCompletionProvider implements vscode.CompletionItemProvider {
         });
     }
 }
+let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
+    // Ask for a password before opening Monty
+    const password = await vscode.window.showInputBox({ 
+        prompt: 'Enter password to start Monty:', 
+        password: true 
+    });
+
+    if (password !== '1234') {  // Change this to your actual password
+        vscode.window.showErrorMessage('Incorrect password! Access denied.');
+        return;
+    }
+
+    // Create a new Webview Panel for "Monty"
+    const panel = vscode.window.createWebviewPanel(
+        'montyChat', 
+        'Monty - AI Assistant', 
+        vscode.ViewColumn.One, 
+        { enableScripts: true, retainContextWhenHidden: true }
+    );
+
+    // Load the initial HTML
+    panel.webview.html = getWebviewContent();
+
+    // Listen for messages from the Webview
+    panel.webview.onDidReceiveMessage(async (message) => {
+        if (message.command === 'sendMessage') {
+            const userInput = message.text;
+            const aiResponse = await getAIResponse(userInput);
+            panel.webview.postMessage({ command: 'receiveMessage', text: aiResponse });
+        }
+    });
+});
+
+
+
+
 
 function extractVariables(text: string): string[] {
     const regex = /^\s*(?:unsigned\s+|signed\s+|long\s+|short\s+)?(?:int|REAL|char|void)\s+(\*?\s*\w+)(?:\s*\[.*\])?\s*(?:=.*)?;/gm;
@@ -310,8 +348,173 @@ context.subscriptions.push(
 
 } // end of activate function
 
+// Function to get AI response from Gemini
+async function getAIResponse(userInput: string): Promise<string> {
+    const apiKey = 'AIzaSyBDU5lpolgT-6W_gYdQeYASXqIikl9QamE'; // Replace with your actual key
+    try {
+        const response = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+            {
+                contents: [{ parts: [{ text: userInput }] }]
+            }
+        );
 
+        let formattedResponse = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+        
+        // Format response with Markdown-like structure
+        formattedResponse = formatAIResponse(formattedResponse);
 
+        return formattedResponse;
+    } catch (error) {
+        const err = error as any; // or use `as AxiosError` if using Axios
+        return `❌ **Error:** ${err.response?.status} - ${err.response?.data?.error?.message || err.message}`;
+    }
+}
 
-// This method is called when your extension is deactivated
+function formatAIResponse(response: string): string {
+    return response
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Convert **bold** to <strong>
+        .replace(/\n\s*\n/g, "<br><br>") // Add extra spacing between paragraphs
+        .replace(/\n- /g, "<ul><li>") // Convert bullet points to lists
+        .replace(/<\/li>\n/g, "</li>") // Ensure bullet points close properly
+        .replace(/<ul><br>/g, "<ul>") // Fix bullet point formatting issues
+        .replace(/```python([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>') // Format Python code
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Format generic code
+        .replace(/\n/g, "<br>"); // Convert new lines to HTML <br> for spacing
+}
+// Function to generate Webview content (HTML + JavaScript)
+function getWebviewContent(): string {
+    return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title> Monty - AI Assistant</title>
+
+        <style>
+            body { 
+                font-family: Arial, sans-serif; 
+                background: #1e1e1e; 
+                color: white; 
+                padding: 10px; 
+            }
+            #chat-container {
+                display: flex; flex-direction: column; max-height: 500px; overflow-y: auto;
+                border: 2px solid #444; padding: 10px; border-radius: 10px; 
+                background: #252526;
+            }
+            .message { margin: 5px 0; padding: 10px; border-radius: 10px; }
+            .user { background: #007acc; align-self: flex-end; text-align: right; }
+            .ai { background: #444; align-self: flex-start; text-align: left; }
+            pre { background: #333; padding: 5px; border-radius: 5px; overflow-x: auto; }
+            code { color: #ffcc00; }
+            .input-container {
+                display: flex; flex-direction: column; margin-top: 10px;
+            }
+            textarea { 
+                width: 100%; height: 80px; padding: 8px; border-radius: 5px; 
+                border: 1px solid #555; background: #333; color: white;
+                resize: none;
+            }
+            button { 
+                padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;
+                background: #007acc; color: white; margin-top: 5px;
+            }
+            button:hover { background: #005fa3; }
+            #header {
+                display: flex; align-items: center; justify-content: space-between;
+                margin-bottom: 10px;
+            }
+            #header img {
+                width: 40px; height: 40px; border-radius: 50%;
+            }
+            #clear-btn {
+                background: red;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <div style="display: flex; align-items: center;">
+                <img src="https://cdn-icons-png.flaticon.com/512/5511/5511666.png" alt="Monty Icon" />
+                <h2>  Monty - AI Chat</h2>
+            </div>
+            <button id="clear-btn" onclick="clearChat()">Clear Chat</button>
+        </div>
+
+        <div id="chat-container"></div>
+
+        <div class="input-container">
+            <textarea id="message" placeholder="Ask Monty..." onkeydown="handleKeyPress(event)"></textarea>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+
+        <script>
+            const vscode = acquireVsCodeApi();
+            let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+
+            function sendMessage() {
+                const messageInput = document.getElementById('message');
+                const text = messageInput.value.trim();
+                if (!text) return;
+
+                appendMessage(text, 'user');
+                messageInput.value = '';
+
+                vscode.postMessage({ command: 'sendMessage', text: text });
+            }
+
+            function appendMessage(text, sender) {
+                const chatDiv = document.getElementById('chat-container');
+                const msgDiv = document.createElement('div');
+                msgDiv.className = sender + ' message';
+                
+                if (sender === 'ai') {
+                    msgDiv.innerHTML = text;
+                } else {
+                    msgDiv.textContent = text;
+                }
+
+                chatDiv.appendChild(msgDiv);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+
+                chatHistory.push({ sender, text });
+                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+            }
+
+            window.addEventListener('message', event => {
+                const message = event.data;
+                if (message.command === 'receiveMessage') {
+                    appendMessage(message.text, 'ai');
+                } else if (message.command === 'clearChat') {
+                    clearChat();
+                }
+            });
+
+            function loadChatHistory() {
+                chatHistory.forEach(msg => appendMessage(msg.text, msg.sender));
+            }
+
+            function clearChat() {
+                document.getElementById('chat-container').innerHTML = '';
+                localStorage.removeItem('chatHistory');
+                chatHistory = [];
+                vscode.postMessage({ command: 'clearChat' });
+            }
+
+            function handleKeyPress(event) {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    sendMessage();
+                }
+            }
+
+            loadChatHistory();
+        </script>
+    </body>
+    </html>
+    `;
+}
 export function deactivate() {}
