@@ -4,7 +4,7 @@
   "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extension is for you. Good luck!",
   "publisher": "ACSPL",
   "creator": "BarPopko",
-  "version": "0.29.2",
+  "version": "0.29.3",
   "icon": "images/logoacs.png",
   "license": "MIT",
   "engines": {
@@ -24,7 +24,8 @@
     "onCommand:acspl.OpenTutorialVideos",
     "onCommand:acspl.JoinUs",
     "onCommand:acspl.OpenLinkedIn",
-    "onCommand:acspl.DeveloperEmail"
+    "onCommand:acspl.DeveloperEmail",
+    "onCommand:acspl.askAI"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -34,17 +35,19 @@
       }
     ],
     "contributes": {
-    "themes": [{
-        "label": "MyTheme",
-        "uiTheme": "vs-dark",
-        "path": "./themes/my-theme.json"
-    }],
-    "semanticTokenColors": {
+      "themes": [
+        {
+          "label": "MyTheme",
+          "uiTheme": "vs-dark",
+          "path": "./themes/my-theme.json"
+        }
+      ],
+      "semanticTokenColors": {
         "variable": "#4FC1FF",
         "keyword": "#FF00FF",
         "type": "#9CDCFE"
-    }
-},
+      }
+    },
     "commands": [
       {
         "command": "acspl.askQuestion",
@@ -90,6 +93,11 @@
         "command": "acspl.DeveloperEmail",
         "category": "ACSPL+",
         "title": "Send email to the developer"
+      },
+      {
+        "command": "acspl.askAI",
+        "category": "ACSPL+",
+        "title": "Ask For Monty's help"
       }
     ],
     "languages": [
@@ -159,6 +167,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "axios": "^1.8.3",
     "gcc": "^1.0.2",
     "gcc-min": "^7.3.0",
     "node-addon-api": "^5.0.0",
