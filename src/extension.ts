@@ -33,48 +33,55 @@ let uploadedPdfText: string | null = null;
 let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
     const panel = vscode.window.createWebviewPanel(
         'montyChat',
-        'Monty - AI Assistant',
+        'Monty - ACS AI Assistant', // 🟢 Sets the title to reflect the assistant's identity
         vscode.ViewColumn.One,
         { enableScripts: true }
     );
 
     panel.webview.html = getWebviewContent();
 
+    // 🟢 Send an introduction message when the assistant starts
+    // Removed invalid onDidLoad event
+        panel.webview.postMessage({
+            command: 'receiveMessage',
+            text: `👋 Hello! I’m 🐎Monty - Your ACS AI Assistant.\n How can I help you today?`
+        });
+
     panel.webview.onDidReceiveMessage(async (message) => {
-        if (message.command === 'sendMessage') {
-            const userInput = message.text.trim();
+            const systemIntro = "You are Monty, an AI assistant specialized in ACS Motion Control and technical guidance.";
     
-            if (uploadedPdfText) {
-                // If a PDF is uploaded, use it along with the query
-                const response = await queryAIWithPdf(userInput, uploadedPdfText);
-                panel.webview.postMessage({ command: 'receiveMessage', text: response });
-            } else {
-                // If no PDF is uploaded, just send the query
-                const response = await getAIResponse(userInput);
-                panel.webview.postMessage({ command: 'receiveMessage', text: response });
-            }
-        }
+            if (message.command === 'sendMessage') {
+                const userInput = message.text.trim();
     
-        if (message.command === 'uploadPDF') {
-            const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64'); // Extract base64 content
-            try {
-                const pdfData = await pdf(pdfBuffer);
-                uploadedPdfText = pdfData.text;
+                let response = "";
     
-                if (message.query.trim()) {
-                    // If both PDF and query are provided
-                    const response = await queryAIWithPdf(message.query, uploadedPdfText);
-                    panel.webview.postMessage({ command: 'receiveMessage', text: response });
+                if (uploadedPdfText) {
+                    response = await queryAIWithPdf(`${systemIntro} ${userInput}`, uploadedPdfText);
                 } else {
-                    // If PDF is uploaded without a query, alert the user
-                    panel.webview.postMessage({ command: 'receiveMessage', text: '✅ PDF uploaded successfully! Now enter a query.' });
+                    response = await getAIResponse(`${systemIntro} ${userInput}`);
                 }
-            } catch (error) {
-                console.error("Error processing PDF:", error);
-                panel.webview.postMessage({ command: 'receiveMessage', text: '❌ Error reading PDF. Please try again.' });
+    
+                panel.webview.postMessage({ command: 'receiveMessage', text: response });
             }
-        }
-    });
+    
+            if (message.command === 'uploadPDF') {
+                const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64');
+                try {
+                    const pdfData = await pdf(pdfBuffer);
+                    uploadedPdfText = pdfData.text;
+    
+                    if (message.query.trim()) {
+                        const response = await queryAIWithPdf(`${systemIntro} ${message.query}`, uploadedPdfText);
+                        panel.webview.postMessage({ command: 'receiveMessage', text: response });
+                    } else {
+                        panel.webview.postMessage({ command: 'receiveMessage', text: '✅ PDF uploaded successfully! Now enter a query.' });
+                    }
+                } catch (error) {
+                    console.error("Error processing PDF:", error);
+                    panel.webview.postMessage({ command: 'receiveMessage', text: '❌ Error reading PDF. Please try again.' });
+                }
+            }
+        });
     
 });
 async function searchDocumentation(query: string): Promise<string> {
