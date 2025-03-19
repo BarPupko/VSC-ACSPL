@@ -154,8 +154,10 @@
   "devDependencies": {
     "@types/estree": "^1.0.6",
     "@types/glob": "^7.2.0",
+    "@types/jquery": "^3.5.32",
     "@types/mocha": "^9.1.1",
     "@types/node": "^16.18.105",
+    "@types/pdf-parse": "^1.1.4",
     "@types/ps-node": "^0.1.1",
     "@types/vscode": "^1.69.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
@@ -171,6 +173,7 @@
     "gcc": "^1.0.2",
     "gcc-min": "^7.3.0",
     "node-addon-api": "^5.0.0",
+    "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "ps-node": "^0.1.6",
     "source-map-loader": "^4.0.0",

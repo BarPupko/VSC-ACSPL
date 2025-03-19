@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 import * as os from "os";
 import axios from 'axios';
-
+import * as pdf from 'pdf-parse';
 import * as execFile from "child_process";
 import * as process from "process"; 
 import * as psNode from "ps-node"; // Using to check if process is in work.
@@ -28,102 +28,96 @@ class VariableCompletionProvider implements vscode.CompletionItemProvider {
         });
     }
 }
+let uploadedPdfText: string | null = null;
+
 let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
-    // Ask for a password before opening Monty
-    const password = await vscode.window.showInputBox({ 
-        prompt: 'Enter password to start Monty:', 
-        password: true 
-    });
-
-    if (password !== '1234') {  // Change this to your actual password
-        vscode.window.showErrorMessage('Incorrect password! Access denied.');
-        return;
-    }
-
-    // Create a new Webview Panel for "Monty"
     const panel = vscode.window.createWebviewPanel(
-        'montyChat', 
-        'Monty - AI Assistant', 
-        vscode.ViewColumn.One, 
-        { enableScripts: true, retainContextWhenHidden: true }
+        'montyChat',
+        'Monty - AI Assistant',
+        vscode.ViewColumn.One,
+        { enableScripts: true }
     );
-    
-    // Load the initial HTML
+
     panel.webview.html = getWebviewContent();
 
-    // Listen for messages from the Webview
     panel.webview.onDidReceiveMessage(async (message) => {
         if (message.command === 'sendMessage') {
-        const userInput = message.text.toLowerCase();
-
-        // Check if user is searching for examples
-        if (userInput.includes('example') || userInput.includes('usage')) {
-            const searchResults = searchDocumentation(userInput);
-            panel.webview.postMessage({ 
-                command: 'receiveMessage', 
-                text: `🔍 **Searching documentation for examples...**<br><br>${searchResults}` 
-            });
-        } else {
-            // Regular AI processing
-            const aiResponse = await getAIResponse(userInput);
-            panel.webview.postMessage({ command: 'receiveMessage', text: aiResponse });
+            const userInput = message.text.trim();
+    
+            if (uploadedPdfText) {
+                // If a PDF is uploaded, use it along with the query
+                const response = await queryAIWithPdf(userInput, uploadedPdfText);
+                panel.webview.postMessage({ command: 'receiveMessage', text: response });
+            } else {
+                // If no PDF is uploaded, just send the query
+                const response = await getAIResponse(userInput);
+                panel.webview.postMessage({ command: 'receiveMessage', text: response });
+            }
         }
-    }
-
-        
-    }
-
-
-);
+    
+        if (message.command === 'uploadPDF') {
+            const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64'); // Extract base64 content
+            try {
+                const pdfData = await pdf(pdfBuffer);
+                uploadedPdfText = pdfData.text;
+    
+                if (message.query.trim()) {
+                    // If both PDF and query are provided
+                    const response = await queryAIWithPdf(message.query, uploadedPdfText);
+                    panel.webview.postMessage({ command: 'receiveMessage', text: response });
+                } else {
+                    // If PDF is uploaded without a query, alert the user
+                    panel.webview.postMessage({ command: 'receiveMessage', text: '✅ PDF uploaded successfully! Now enter a query.' });
+                }
+            } catch (error) {
+                console.error("Error processing PDF:", error);
+                panel.webview.postMessage({ command: 'receiveMessage', text: '❌ Error reading PDF. Please try again.' });
+            }
+        }
+    });
+    
 });
-
-
-
-function searchDocumentation(query: string): string {
-    const docFolder = "C:\\Program Files (x86)\\ACS Motion Control\\SPiiPlus Documentation Kit\\Software Guides";
+async function searchDocumentation(query: string): Promise<string> {
+    const docFolder = "C:\\Software Guides";
+    const pdfFile = path.join(docFolder, "ACSPL-Commands-Variables-Reference-Guide.pdf");
 
     try {
-        // Get a list of all files inside the documentation folder
-        const files = fs.readdirSync(docFolder);
-
-        // Filter only `.pdf`, `.txt`, or `.html` files that may contain relevant info
-        const relevantFiles = files.filter(file => 
-            file.toLowerCase().endsWith('.pdf') || 
-            file.toLowerCase().endsWith('.txt') || 
-            file.toLowerCase().endsWith('.html')
-        );
-
-        if (relevantFiles.length === 0) {
-            return "⚠️ No relevant documentation found in the local folder.";
+        // Check if the file exists
+        if (!fs.existsSync(pdfFile)) {
+            console.error("Error: PDF file not found at", pdfFile);
+            return "❌ **Error:** Documentation file not found.";
         }
 
-         // Search for examples inside files
-         let foundExamples = "";
-         for (const file of relevantFiles) {
-             const filePath = path.join(docFolder, file);
-             const content = fs.readFileSync(filePath, 'utf8');
- 
-             // Search for query inside the file
-             const regex = new RegExp(`.*${query}.*`, 'gi');
-             const matches = content.match(regex);
- 
-             if (matches) {
-                 foundExamples += `📄 **From ${file}**:<br><pre><code>${matches.join("\n")}</code></pre><br>`;
-             }
-         }
- 
-         if (!foundExamples) {
-             return "⚠️ No examples found in the documentation.";
-         }
- 
-         return foundExamples;
-     } catch (error) {
-         console.error("Error accessing documentation folder:", error);
-         return "❌ **Error:** Unable to access documentation folder.";
-     }
- }
+        console.log("Reading PDF:", pdfFile);
+        const dataBuffer = fs.readFileSync(pdfFile);
+        const pdfData = await pdf(dataBuffer);
+        const content = pdfData.text;
 
+        console.log("Extracted PDF content:", content.substring(0, 500)); // Log first 500 chars
 
+        // ✅ General regex to match **any** ACSPL command (e.g., PTP, MOVE, VEL, etc.)
+        const keywords = [
+            "global", "static", "local", "ref", "int", "real", "struct", "void", "break", "commut", "connect", "depends", "disable", "disableall", "enable",
+            "enableall", "encinit", "fclear", "follow", "go", "group", "halt", "home", "imm", "kill", "killall", "safetyconf", "safetygroup", "set", "split", "unfollow", "disp", "string", "inp", "interrupt",
+            "interruptex", "send", "trigger", "outp", "assignmark", "assignpeg", "assignpouts", "peg_i", "peg_r", "startpeg", "stoppeg", "axisdef", "dc", "stopdc", "read", "spdc", "write", "spinject",
+            "stopinject", "sprt", "sprtstop", "eipgetattr", "eipgetind1", "eipgetind2", "eipgettag", "eipsetasm", "arc1", "arc2", "bptp", "bptpcalc", "bseg", "ends", "jog", "line", "master", "mpoint",
+            "mptp", "mseg", "path", "point", "projection", "ptp", "pvspline", "slave", "stopper", "track", "xseg", "block", "end", "call", "goto", "if", "else", "elseif", "input", "loop", "on", "till", "wait", "while",
+            "ret", "disabelon", "enableon", "pause", "resume", "start", "stop", "stopall", "lcenable", "lcdisable", "inshapeon", "inshapeoff", "LCI", "DPM_Measurement", "DPM_Motion_Status"
+        ];
+        
+        const keywordRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, 'gi');
+        const matches = content.match(keywordRegex);
+
+        if (matches && matches.length > 0) {
+            return `📄 **Matching ACSPL Commands:**<br><pre><code>${matches.slice(0, 5).join("\n")}</code></pre>`;
+        } else {
+            return "⚠️ No relevant ACSPL commands found.";
+        }
+    } catch (error) {
+        console.error("Error processing PDF:", error);
+        return "❌ **Error:** Unable to process PDF.";
+    }
+}
 function extractVariables(text: string): string[] {
     const regex = /^\s*(?:unsigned\s+|signed\s+|long\s+|short\s+)?(?:int|REAL|char|void)\s+(\*?\s*\w+)(?:\s*\[.*\])?\s*(?:=.*)?;/gm;
     const matches = [...text.matchAll(regex)];
@@ -406,6 +400,11 @@ context.subscriptions.push(
 
 
 } // end of activate function
+async function queryAIWithPdf(query: string, pdfContent: string): Promise<string> {
+	const prompt = `Answer based on this PDF content: ${pdfContent}\n\nQuestion: ${query}`;
+	return await getAIResponse(prompt);
+}
+
 
 // Function to get AI response from Gemini
 async function getAIResponse(userInput: string): Promise<string> {
@@ -441,6 +440,9 @@ function formatAIResponse(response: string): string {
         .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Format generic code
         .replace(/\n/g, "<br>"); // Convert new lines to HTML <br> for spacing
 }
+
+
+
 function getWebviewContent(): string {
     return `
     <!DOCTYPE html>
@@ -469,10 +471,11 @@ function getWebviewContent(): string {
             .input-container {
                 display: flex; flex-direction: column; margin-top: 10px;
             }
-            textarea { 
-                width: 100%; height: 80px; padding: 8px; border-radius: 5px; 
+            textarea, input[type="file"] { 
+                width: 100%; padding: 8px; border-radius: 5px; 
                 border: 1px solid #555; background: #333; color: white;
                 resize: none;
+                margin-top: 5px;
             }
             button { 
                 padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;
@@ -485,9 +488,34 @@ function getWebviewContent(): string {
             }
             #header img {
                 width: 40px; height: 40px; border-radius: 50%;
+                margin-right: 10px;
             }
             #clear-btn {
                 background: red;
+                padding: 6px 10px;
+                font-weight: bold;
+            }
+            #disclaimer {
+                margin-top: 10px;
+                padding: 8px;
+                border-left: 4px solid #007acc;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 5px;
+            }
+            h3 {
+                color: #ffcc00;
+                margin: 5px 0;
+                font-size: 1.1em;
+            }
+            a {
+                color: #00aaff;
+                text-decoration: underline;
+                cursor: pointer;
+                display: block;
+                margin-top: 5px;
+            }
+            a:hover {
+                color: #0088cc;
             }
         </style>
     </head>
@@ -496,25 +524,24 @@ function getWebviewContent(): string {
             <div style="display: flex; align-items: center;">
                 <img src="https://cdn-icons-png.flaticon.com/512/5511/5511666.png" alt="Monty Icon" />
                 <h2>Monty - AI Chat</h2>
-                 <h3>Important Disclaimer:</h3>
-            <a href="#">Please be aware that the information provided here is based on an AI model. 
-            While I strive for accuracy, AI-generated content may contain errors. 
-            Always verify critical information with official documentation.</a>
             </div>
             <button id="clear-btn" onclick="clearChat()">Clear Chat</button>
         </div>
 
-        <div id="chat-container"></div>
-
-        <div class="input-container">
-            <textarea id="message" placeholder="Ask Monty..." onkeydown="handleKeyPress(event)"></textarea>
-            <button onclick="sendMessage()">Send</button>
+        <div id="disclaimer">
+            <h3>Important Disclaimer:</h3>
+            <a>Please be aware that the information provided here is based on an AI model. 
+            While I strive for accuracy, AI-generated content may contain errors. 
+            Always verify critical information with official documentation.</a>
         </div>
 
-        <!-- File Upload Section -->
+        <div id="chat-container"></div>
+
+        <!-- Input Area for Query & File -->
         <div class="input-container">
-            <input type="file" id="fileUpload">
-            <button onclick="uploadFile()">Upload File</button>
+            <textarea id="message" placeholder="Ask Monty..." onkeydown="handleKeyPress(event)"></textarea>
+            <input type="file" id="fileUpload" accept=".pdf">
+            <button onclick="sendMessage()">Send</button>
         </div>
 
         <script>
@@ -524,12 +551,44 @@ function getWebviewContent(): string {
             function sendMessage() {
                 const messageInput = document.getElementById('message');
                 const text = messageInput.value.trim();
-                if (!text) return;
+                const fileInput = document.getElementById('fileUpload');
+                const file = fileInput.files[0];
 
-                appendMessage(text, 'user');
-                messageInput.value = '';
+                // Case 1: If both query and file are provided
+                if (file && text) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const fileContent = event.target.result;
+                        vscode.postMessage({
+                            command: 'uploadPDF',
+                            filename: file.name,
+                            content: fileContent,
+                            query: text
+                        });
+                        appendMessage(text, 'user');
+                        messageInput.value = '';  // Clear text area
+                        fileInput.value = '';  // Clear file input
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
 
-                vscode.postMessage({ command: 'sendMessage', text: text });
+                // Case 2: If only query is provided
+                if (text) {
+                    appendMessage(text, 'user');
+                    messageInput.value = '';  // Clear text area
+                    vscode.postMessage({ command: 'sendMessage', text: text });
+                    return;
+                }
+
+                // Case 3: If only file is uploaded without query
+                if (file) {
+                    alert('Please enter a query along with the file.');
+                    return;
+                }
+
+                // Case 4: If nothing is provided
+                alert('Please enter a query or upload a PDF.');
             }
 
             function appendMessage(text, sender) {
@@ -577,29 +636,14 @@ function getWebviewContent(): string {
                 }
             }
 
-            function uploadFile() {
-                const fileInput = document.getElementById('fileUpload');
-                const file = fileInput.files[0];
-
-                if (!file) {
-                    alert('No file selected.');
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const fileContent = event.target.result;
-                    vscode.postMessage({ command: 'uploadFile', filename: file.name, content: fileContent });
-                };
-                reader.readAsText(file);
-            }
-
             loadChatHistory();
         </script>
     </body>
     </html>
     `;
 }
+
+
 
 export function deactivate() {}
 
