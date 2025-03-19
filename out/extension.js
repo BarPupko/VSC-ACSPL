@@ -23,34 +23,38 @@ class VariableCompletionProvider {
 }
 let uploadedPdfText = null;
 let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
-    const panel = vscode.window.createWebviewPanel('montyChat', 'Monty - AI Assistant', vscode.ViewColumn.One, { enableScripts: true });
+    const panel = vscode.window.createWebviewPanel('montyChat', 'Monty - ACS AI Assistant', // 🟢 Sets the title to reflect the assistant's identity
+    vscode.ViewColumn.One, { enableScripts: true });
     panel.webview.html = getWebviewContent();
+    // 🟢 Send an introduction message when the assistant starts
+    // Removed invalid onDidLoad event
+    panel.webview.postMessage({
+        command: 'receiveMessage',
+        text: `👋 Hello! I’m 🐎Monty - Your ACS AI Assistant.\n How can I help you today?`
+    });
     panel.webview.onDidReceiveMessage(async (message) => {
+        const systemIntro = "You are Monty, an AI assistant specialized in ACS Motion Control and technical guidance.";
         if (message.command === 'sendMessage') {
             const userInput = message.text.trim();
+            let response = "";
             if (uploadedPdfText) {
-                // If a PDF is uploaded, use it along with the query
-                const response = await queryAIWithPdf(userInput, uploadedPdfText);
-                panel.webview.postMessage({ command: 'receiveMessage', text: response });
+                response = await queryAIWithPdf(`${systemIntro} ${userInput}`, uploadedPdfText);
             }
             else {
-                // If no PDF is uploaded, just send the query
-                const response = await getAIResponse(userInput);
-                panel.webview.postMessage({ command: 'receiveMessage', text: response });
+                response = await getAIResponse(`${systemIntro} ${userInput}`);
             }
+            panel.webview.postMessage({ command: 'receiveMessage', text: response });
         }
         if (message.command === 'uploadPDF') {
-            const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64'); // Extract base64 content
+            const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64');
             try {
                 const pdfData = await pdf(pdfBuffer);
                 uploadedPdfText = pdfData.text;
                 if (message.query.trim()) {
-                    // If both PDF and query are provided
-                    const response = await queryAIWithPdf(message.query, uploadedPdfText);
+                    const response = await queryAIWithPdf(`${systemIntro} ${message.query}`, uploadedPdfText);
                     panel.webview.postMessage({ command: 'receiveMessage', text: response });
                 }
                 else {
-                    // If PDF is uploaded without a query, alert the user
                     panel.webview.postMessage({ command: 'receiveMessage', text: '✅ PDF uploaded successfully! Now enter a query.' });
                 }
             }
