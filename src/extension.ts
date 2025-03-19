@@ -3,13 +3,17 @@
 import * as vscode from "vscode";
 import * as os from "os";
 import axios from 'axios';
-import * as pdf from 'pdf-parse';
+import pdf from 'pdf-parse';
 import * as execFile from "child_process";
+import Mocha from 'mocha';
+import glob from 'glob';
+
 import * as process from "process"; 
 import * as psNode from "ps-node"; // Using to check if process is in work.
 import * as fs from "fs"; // Check if file exists in file system.
 import * as path from 'path'; // Import path module to handle paths easily
 const legend = new vscode.SemanticTokensLegend(['variable', 'keyword', 'type'], []);
+
 class VariableCompletionProvider implements vscode.CompletionItemProvider {
     provideCompletionItems(
         document: vscode.TextDocument,

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
+exports.activate = activate;
+exports.deactivate = deactivate;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
@@ -317,7 +318,6 @@ function activate(context) {
         }
     }));
 } // end of activate function
-exports.activate = activate;
 async function queryAIWithPdf(query, pdfContent) {
     const prompt = `Answer based on this PDF content: ${pdfContent}\n\nQuestion: ${query}`;
     return await getAIResponse(prompt);
@@ -550,5 +550,4 @@ function getWebviewContent() {
     `;
 }
 function deactivate() { }
-exports.deactivate = deactivate;
 //# sourceMappingURL=extension.js.map

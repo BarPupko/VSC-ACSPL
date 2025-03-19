@@ -4,7 +4,7 @@
   "description": "Syntax highlighting is one strategy to improve the readability and context of the text, especially for code that spans several pages. The reader can easily ignore large sections of comments or code, depending on what they are looking for. If you program in ACSPL+ this extension is for you. Good luck!",
   "publisher": "ACSPL",
   "creator": "BarPopko",
-  "version": "0.29.3",
+  "version": "0.29.4",
   "icon": "images/logoacs.png",
   "license": "MIT",
   "engines": {
@@ -154,19 +154,18 @@
   "devDependencies": {
     "@types/estree": "^1.0.6",
     "@types/glob": "^7.2.0",
-    "@types/jquery": "^3.5.32",
+    "@types/jquery": "^3.5.14",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^16.18.105",
+    "@types/node": "^16.18.126",
     "@types/pdf-parse": "^1.1.4",
     "@types/ps-node": "^0.1.1",
+    "@types/sizzle": "^2.3.9",
     "@types/vscode": "^1.69.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "@vscode/test-electron": "^2.1.5",
     "eslint": "^8.20.0",
-    "glob": "^8.0.3",
-    "mocha": "^10.0.0",
-    "typescript": "^4.7.4"
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "axios": "^1.8.3",
