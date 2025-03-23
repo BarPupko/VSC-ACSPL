@@ -8,14 +8,13 @@
   "icon": "images/logoacs.png",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.69.0"
+    "vscode": "^1.75.0"
   },
   "categories": [
     "Other",
     "Programming Languages"
   ],
   "activationEvents": [
-    "onCommand:acspl.askQuestion",
     "onCommand:acspl.OpenMMI",
     "onCommand:acspl.OpenUserModeDrive",
     "onCommand:acspl.OpenUpdateCenter",

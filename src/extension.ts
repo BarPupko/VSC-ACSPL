@@ -5,15 +5,11 @@ import * as os from "os";
 import axios from 'axios';
 import pdf from 'pdf-parse';
 import * as execFile from "child_process";
-import Mocha from 'mocha';
-import glob from 'glob';
-
 import * as process from "process"; 
 import * as psNode from "ps-node"; // Using to check if process is in work.
 import * as fs from "fs"; // Check if file exists in file system.
 import * as path from 'path'; // Import path module to handle paths easily
 const legend = new vscode.SemanticTokensLegend(['variable', 'keyword', 'type'], []);
-
 class VariableCompletionProvider implements vscode.CompletionItemProvider {
     provideCompletionItems(
         document: vscode.TextDocument,
@@ -33,6 +29,16 @@ class VariableCompletionProvider implements vscode.CompletionItemProvider {
     }
 }
 let uploadedPdfText: string | null = null;
+
+let currntLoop = vscode.commands.registerCommand('acspl.CurrentLoop',async () => {
+    const panel = vscode.window.createWebviewPanel(
+        'CurrentLoop',
+        'CurrentLoop',
+        vscode.ViewColumn.One,
+        {enableScripts: true}
+
+    );
+})
 
 let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
     const panel = vscode.window.createWebviewPanel(
@@ -88,47 +94,7 @@ let disposable = vscode.commands.registerCommand('acspl.askAI', async () => {
         });
     
 });
-async function searchDocumentation(query: string): Promise<string> {
-    const docFolder = "C:\\Software Guides";
-    const pdfFile = path.join(docFolder, "ACSPL-Commands-Variables-Reference-Guide.pdf");
 
-    try {
-        // Check if the file exists
-        if (!fs.existsSync(pdfFile)) {
-            console.error("Error: PDF file not found at", pdfFile);
-            return "❌ **Error:** Documentation file not found.";
-        }
-
-        console.log("Reading PDF:", pdfFile);
-        const dataBuffer = fs.readFileSync(pdfFile);
-        const pdfData = await pdf(dataBuffer);
-        const content = pdfData.text;
-
-        console.log("Extracted PDF content:", content.substring(0, 500)); // Log first 500 chars
-
-        // ✅ General regex to match **any** ACSPL command (e.g., PTP, MOVE, VEL, etc.)
-        const keywords = [
-            "global", "static", "local", "ref", "int", "real", "struct", "void", "break", "commut", "connect", "depends", "disable", "disableall", "enable",
-            "enableall", "encinit", "fclear", "follow", "go", "group", "halt", "home", "imm", "kill", "killall", "safetyconf", "safetygroup", "set", "split", "unfollow", "disp", "string", "inp", "interrupt",
-            "interruptex", "send", "trigger", "outp", "assignmark", "assignpeg", "assignpouts", "peg_i", "peg_r", "startpeg", "stoppeg", "axisdef", "dc", "stopdc", "read", "spdc", "write", "spinject",
-            "stopinject", "sprt", "sprtstop", "eipgetattr", "eipgetind1", "eipgetind2", "eipgettag", "eipsetasm", "arc1", "arc2", "bptp", "bptpcalc", "bseg", "ends", "jog", "line", "master", "mpoint",
-            "mptp", "mseg", "path", "point", "projection", "ptp", "pvspline", "slave", "stopper", "track", "xseg", "block", "end", "call", "goto", "if", "else", "elseif", "input", "loop", "on", "till", "wait", "while",
-            "ret", "disabelon", "enableon", "pause", "resume", "start", "stop", "stopall", "lcenable", "lcdisable", "inshapeon", "inshapeoff", "LCI", "DPM_Measurement", "DPM_Motion_Status"
-        ];
-        
-        const keywordRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, 'gi');
-        const matches = content.match(keywordRegex);
-
-        if (matches && matches.length > 0) {
-            return `📄 **Matching ACSPL Commands:**<br><pre><code>${matches.slice(0, 5).join("\n")}</code></pre>`;
-        } else {
-            return "⚠️ No relevant ACSPL commands found.";
-        }
-    } catch (error) {
-        console.error("Error processing PDF:", error);
-        return "❌ **Error:** Unable to process PDF.";
-    }
-}
 function extractVariables(text: string): string[] {
     const regex = /^\s*(?:unsigned\s+|signed\s+|long\s+|short\s+)?(?:int|REAL|char|void)\s+(\*?\s*\w+)(?:\s*\[.*\])?\s*(?:=.*)?;/gm;
     const matches = [...text.matchAll(regex)];
@@ -440,19 +406,38 @@ async function getAIResponse(userInput: string): Promise<string> {
     }
 }
 
+
 function formatAIResponse(response: string): string {
     return response
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Convert **bold** to <strong>
+        .replace(/\/\/.*?!/g, "!") // Replace everything from // to ! with !
         .replace(/\n\s*\n/g, "<br><br>") // Add extra spacing between paragraphs
         .replace(/\n- /g, "<ul><li>") // Convert bullet points to lists
         .replace(/<\/li>\n/g, "</li>") // Ensure bullet points close properly
         .replace(/<ul><br>/g, "<ul>") // Fix bullet point formatting issues
-        .replace(/```python([\s\S]*?)```/g, '<pre><code class="language-python">$1</code></pre>') // Format Python code
+        .replace(/```([\s\S]*?)```/g, (_, code) => {
+            const escaped = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            return `
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+          <pre><code class="language-acspl">${escaped}</code></pre>
+        </div>`;
+        })
         .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>') // Format generic code
         .replace(/\n/g, "<br>"); // Convert new lines to HTML <br> for spacing
 }
 
+function copyCode(buttonElement: HTMLElement) {
+    const codeBlock = buttonElement.nextElementSibling?.querySelector("code");
+    if (!codeBlock) return;
 
+    const textToCopy = codeBlock.textContent || '';
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("Copied!");
+    }).catch(err => {
+        alert("Failed to copy: " + err);
+    });
+}
 
 function getWebviewContent(): string {
     return `
@@ -527,6 +512,25 @@ function getWebviewContent(): string {
             }
             a:hover {
                 color: #0088cc;
+            }
+            .code-block {
+            position: relative;
+            background: #1e1e1e;
+            color: #dcdcdc;
+            border-radius: 10px;
+            margin: 1em 0;
+            }
+
+            .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
             }
         </style>
     </head>
@@ -657,4 +661,3 @@ function getWebviewContent(): string {
 
 
 export function deactivate() {}
-
