@@ -50,11 +50,157 @@ exports.deactivate = deactivate;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(require("vscode"));
-const axios_1 = __importDefault(require("axios"));
 const pdf_parse_1 = __importDefault(require("pdf-parse"));
 const execFile = __importStar(require("child_process"));
+const process = __importStar(require("process"));
 const fs = __importStar(require("fs")); // Check if file exists in file system.
 const path = __importStar(require("path")); // Import path module to handle paths easily
+const crypto = __importStar(require("crypto")); // For SHA256 hashing
+const admin = __importStar(require("firebase-admin")); // Firebase Admin SDK
+const sdk_1 = __importDefault(require("@anthropic-ai/sdk"));
+const dotenv = __importStar(require("dotenv"));
+// Load environment variables - try multiple paths
+const envPath1 = path.join(__dirname, '..', '.env');
+const envPath2 = path.join(__dirname, '..', '..', '.env');
+const envPath3 = 'c:\\Projects\\VSC-ACSPL\\.env'; // Absolute fallback
+console.log('__dirname:', __dirname);
+console.log('Trying env paths:', envPath1, envPath2, envPath3);
+if (fs.existsSync(envPath1)) {
+    const result = dotenv.config({ path: envPath1 });
+    console.log('✅ Loaded .env from:', envPath1);
+    if (result.error) {
+        console.error('❌ Error loading .env:', result.error);
+    }
+}
+else if (fs.existsSync(envPath2)) {
+    const result = dotenv.config({ path: envPath2 });
+    console.log('✅ Loaded .env from:', envPath2);
+    if (result.error) {
+        console.error('❌ Error loading .env:', result.error);
+    }
+}
+else if (fs.existsSync(envPath3)) {
+    const result = dotenv.config({ path: envPath3 });
+    console.log('✅ Loaded .env from:', envPath3, '(fallback)');
+    if (result.error) {
+        console.error('❌ Error loading .env:', result.error);
+    }
+}
+else {
+    console.error('❌ .env file not found at:', envPath1, 'or', envPath2, 'or', envPath3);
+}
+// Firebase configuration and initialization
+let firebaseInitialized = false;
+function initializeFirebase(context) {
+    if (firebaseInitialized) {
+        return;
+    }
+    try {
+        // Get Firebase config from VSCode settings or use service account file
+        const config = vscode.workspace.getConfiguration('acspl');
+        const serviceAccountPath = config.get('firebaseServiceAccountPath');
+        if (serviceAccountPath && fs.existsSync(serviceAccountPath)) {
+            const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: config.get('firebaseDatabaseURL')
+            });
+            firebaseInitialized = true;
+        }
+        else {
+            console.warn('Firebase service account not configured. Chat authentication will be disabled.');
+        }
+    }
+    catch (error) {
+        console.error('Failed to initialize Firebase:', error);
+    }
+}
+// SHA256 hashing function
+function hashTimestamp(timestamp) {
+    return crypto.createHash('sha256').update(timestamp.toString()).digest('hex');
+}
+// Generate a unique special code
+function generateSpecialCode() {
+    return crypto.randomBytes(16).toString('hex');
+}
+// Verify special code with Firebase
+function verifySpecialCode(code) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!firebaseInitialized) {
+            return false;
+        }
+        try {
+            const db = admin.database();
+            const usersRef = db.ref('users');
+            const snapshot = yield usersRef.orderByChild('specialCode').equalTo(code).once('value');
+            if (snapshot.exists()) {
+                const userData = Object.values(snapshot.val())[0];
+                return userData.isActive === true;
+            }
+            return false;
+        }
+        catch (error) {
+            console.error('Error verifying special code:', error);
+            return false;
+        }
+    });
+}
+// Create new user with special code
+function createUserWithCode() {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!firebaseInitialized) {
+            return null;
+        }
+        try {
+            const db = admin.database();
+            const usersRef = db.ref('users');
+            const newUserRef = usersRef.push();
+            const specialCode = generateSpecialCode();
+            const timestamp = Date.now();
+            yield newUserRef.set({
+                specialCode: specialCode,
+                createdAt: timestamp,
+                lastRenewed: timestamp,
+                timestampHash: hashTimestamp(timestamp),
+                isActive: true
+            });
+            return specialCode;
+        }
+        catch (error) {
+            console.error('Error creating user:', error);
+            return null;
+        }
+    });
+}
+// Renew user code
+function renewUserCode(oldCode) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!firebaseInitialized) {
+            return null;
+        }
+        try {
+            const db = admin.database();
+            const usersRef = db.ref('users');
+            const snapshot = yield usersRef.orderByChild('specialCode').equalTo(oldCode).once('value');
+            if (snapshot.exists()) {
+                const userId = Object.keys(snapshot.val())[0];
+                const newCode = generateSpecialCode();
+                const timestamp = Date.now();
+                yield usersRef.child(userId).update({
+                    specialCode: newCode,
+                    lastRenewed: timestamp,
+                    timestampHash: hashTimestamp(timestamp)
+                });
+                return newCode;
+            }
+            return null;
+        }
+        catch (error) {
+            console.error('Error renewing code:', error);
+            return null;
+        }
+    });
+}
 const legend = new vscode.SemanticTokensLegend(['variable', 'keyword', 'type'], []);
 class VariableCompletionProvider {
     provideCompletionItems(document, position, token, context) {
@@ -72,18 +218,103 @@ let currntLoop = vscode.commands.registerCommand('acspl.CurrentLoop', () => __aw
     const panel = vscode.window.createWebviewPanel('CurrentLoop', 'CurrentLoop', vscode.ViewColumn.One, { enableScripts: true });
 }));
 let disposable = vscode.commands.registerCommand('acspl.askAI', () => __awaiter(void 0, void 0, void 0, function* () {
-    const panel = vscode.window.createWebviewPanel('montyChat', 'Monty - ACS AI Assistant', // 🟢 Sets the title to reflect the assistant's identity
-    vscode.ViewColumn.One, { enableScripts: true });
+    const panel = vscode.window.createWebviewPanel('montyChat', 'Monty - ACS AI Assistant', vscode.ViewColumn.One, { enableScripts: true });
+    let isAuthenticated = false;
+    let userCode = null;
     panel.webview.html = getWebviewContent();
-    // 🟢 Send an introduction message when the assistant starts
-    // Removed invalid onDidLoad event
-    panel.webview.postMessage({
-        command: 'receiveMessage',
-        text: `👋 Hello! I’m 🐎Monty - Your ACS AI Assistant.\n How can I help you today?`
-    });
     panel.webview.onDidReceiveMessage((message) => __awaiter(void 0, void 0, void 0, function* () {
-        const systemIntro = "You are Monty, an AI assistant specialized in ACS Motion Control and technical guidance.";
+        const systemIntro = `You are Monty, a specialized Learning Coach focused on helping users master ACS Motion Control technologies, products, and concepts through company documentation.
+
+Core Skills:
+- Document-Based Learning: Extract and explain key concepts from ACS Motion Control documentation, cross-reference information, identify critical sections
+- Technical Concept Breakdown: Simplify motion control concepts (servo systems, motion controllers, programming, fieldbus protocols) into beginner, intermediate, and advanced levels
+- Skill Development & Practice: Create hands-on exercises, programming examples, configuration tasks, troubleshooting scenarios
+- Learning Process Optimization: Help define learning goals specific to ACS Motion Control (SPiiPlus programming, ACS controller configuration)
+
+ACS Motion Control Context:
+- Focus on motion controller products, servo drives, and related software
+- Emphasize practical applications in automation and industrial motion
+- Reference ACS-specific programming languages (ACSPL+) and tools
+- Connect learning to industry standards and best practices in motion control
+
+Interaction Guidelines:
+- Maintain a professional, technical yet approachable tone
+- Adapt explanations to the user's background
+- Provide step-by-step guidance when explaining complex procedures
+- Use examples directly from shared documentation whenever possible
+- Check understanding regularly with quick knowledge checks
+- Never provide external links - focus solely on the documentation provided`;
+        // Handle authentication
+        if (message.command === 'authenticate') {
+            const code = message.code.trim();
+            // Check if Firebase is initialized
+            if (!firebaseInitialized) {
+                panel.webview.postMessage({
+                    command: 'authResult',
+                    success: false,
+                    message: '❌ Firebase authentication is not configured. Please contact your administrator.'
+                });
+                return;
+            }
+            // Verify code with Firebase
+            const isValid = yield verifySpecialCode(code);
+            if (isValid) {
+                isAuthenticated = true;
+                userCode = code;
+                panel.webview.postMessage({
+                    command: 'authResult',
+                    success: true,
+                    message: '✅ Authentication successful! Welcome to Monty Chat.'
+                });
+                // Send welcome message
+                panel.webview.postMessage({
+                    command: 'receiveMessage',
+                    text: `👋 Hello! I'm 🐎Monty - Your ACS AI Assistant.\n\nHow can I help you today?`
+                });
+            }
+            else {
+                panel.webview.postMessage({
+                    command: 'authResult',
+                    success: false,
+                    message: '❌ Invalid special code. Please try again or contact support.'
+                });
+            }
+        }
+        // Handle code renewal
+        if (message.command === 'renewCode') {
+            if (userCode && firebaseInitialized) {
+                const newCode = yield renewUserCode(userCode);
+                if (newCode) {
+                    userCode = newCode;
+                    panel.webview.postMessage({
+                        command: 'codeRenewed',
+                        newCode: newCode,
+                        message: `✅ Your new special code is: ${newCode}\n\nPlease save it securely!`
+                    });
+                }
+                else {
+                    panel.webview.postMessage({
+                        command: 'renewError',
+                        message: '❌ Failed to renew code. Please try again later.'
+                    });
+                }
+            }
+            else {
+                panel.webview.postMessage({
+                    command: 'renewError',
+                    message: '❌ Code renewal is not available.'
+                });
+            }
+        }
+        // Handle chat messages (only if authenticated)
         if (message.command === 'sendMessage') {
+            if (!isAuthenticated) {
+                panel.webview.postMessage({
+                    command: 'receiveMessage',
+                    text: '❌ Please authenticate first to use the chat.'
+                });
+                return;
+            }
             const userInput = message.text.trim();
             let response = "";
             if (uploadedPdfText) {
@@ -94,7 +325,15 @@ let disposable = vscode.commands.registerCommand('acspl.askAI', () => __awaiter(
             }
             panel.webview.postMessage({ command: 'receiveMessage', text: response });
         }
+        // Handle PDF upload (only if authenticated)
         if (message.command === 'uploadPDF') {
+            if (!isAuthenticated) {
+                panel.webview.postMessage({
+                    command: 'receiveMessage',
+                    text: '❌ Please authenticate first to upload PDFs.'
+                });
+                return;
+            }
             const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64');
             try {
                 const pdfData = yield (0, pdf_parse_1.default)(pdfBuffer);
@@ -131,6 +370,8 @@ vscode.languages.registerHoverProvider('acsplext', {
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 function activate(context) {
+    // Initialize Firebase
+    initializeFirebase(context);
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'acsplext' }, new VariableCompletionProvider(), ' ', '\t', '=', '(' // Adjust triggers for your syntax
     ));
     // Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -336,23 +577,45 @@ function queryAIWithPdf(query, pdfContent) {
         return yield getAIResponse(prompt);
     });
 }
-// Function to get AI response from Gemini
+// Function to get AI response from Claude
 function getAIResponse(userInput) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
-        const apiKey = 'AIzaSyBDU5lpolgT-6W_gYdQeYASXqIikl9QamE'; // Replace with your actual key
+        const apiKey = process.env.CLAUDE_API_KEY;
+        console.log('API Key check:', apiKey ? 'Found (length: ' + apiKey.length + ')' : 'NOT FOUND');
+        console.log('All env vars:', Object.keys(process.env).filter(k => k.includes('CLAUDE')));
+        if (!apiKey) {
+            return '❌ **Error:** Claude API key not configured. Please check your .env file.\n\nTried loading from: ' + path.join(__dirname, '..', '.env');
+        }
         try {
-            const response = yield axios_1.default.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-                contents: [{ parts: [{ text: userInput }] }]
+            const anthropic = new sdk_1.default({
+                apiKey: apiKey
             });
-            let formattedResponse = ((_f = (_e = (_d = (_c = (_b = (_a = response.data) === null || _a === void 0 ? void 0 : _a.candidates) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.content) === null || _d === void 0 ? void 0 : _d.parts) === null || _e === void 0 ? void 0 : _e[0]) === null || _f === void 0 ? void 0 : _f.text) || "No response received.";
+            const response = yield anthropic.messages.create({
+                model: 'claude-3-5-sonnet-20241022',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                max_tokens: 2048,
+                messages: [{
+                        role: 'user',
+                        content: userInput
+                    }]
+            });
+            let formattedResponse = '';
+            // Extract text from Claude's response
+            for (const block of response.content) {
+                if (block.type === 'text') {
+                    formattedResponse += block.text;
+                }
+            }
+            if (!formattedResponse) {
+                return "No response received from Claude.";
+            }
             // Format response with Markdown-like structure
             formattedResponse = formatAIResponse(formattedResponse);
             return formattedResponse;
         }
         catch (error) {
-            const err = error; // or use `as AxiosError` if using Axios
-            return `❌ **Error:** ${(_g = err.response) === null || _g === void 0 ? void 0 : _g.status} - ${((_k = (_j = (_h = err.response) === null || _h === void 0 ? void 0 : _h.data) === null || _j === void 0 ? void 0 : _j.error) === null || _k === void 0 ? void 0 : _k.message) || err.message}`;
+            const err = error;
+            return `❌ **Error:** ${err.status || 'Unknown'} - ${err.message || 'Failed to connect to Claude API'}`;
         }
     });
 }
@@ -396,128 +659,519 @@ function getWebviewContent() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Monty - AI Assistant</title>
         <style>
-            body { 
-                font-family: Arial, sans-serif; 
-                background: #1e1e1e; 
-                color: white; 
-                padding: 10px; 
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
-            #chat-container {
-                display: flex; flex-direction: column; max-height: 500px; overflow-y: auto;
-                border: 2px solid #444; padding: 10px; border-radius: 10px; 
-                background: #252526;
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+                color: #e0e0e0;
+                padding: 20px;
+                min-height: 100vh;
             }
-            .message { margin: 5px 0; padding: 10px; border-radius: 10px; }
-            .user { background: #007acc; align-self: flex-end; text-align: right; }
-            .ai { background: #444; align-self: flex-start; text-align: left; }
-            pre { background: #333; padding: 5px; border-radius: 5px; overflow-x: auto; }
-            code { color: #ffcc00; }
-            .input-container {
-                display: flex; flex-direction: column; margin-top: 10px;
+
+            /* Authentication Screen */
+            #auth-screen {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 80vh;
+                animation: fadeIn 0.5s ease-in;
             }
-            textarea, input[type="file"] { 
-                width: 100%; padding: 8px; border-radius: 5px; 
-                border: 1px solid #555; background: #333; color: white;
-                resize: none;
-                margin-top: 5px;
+
+            #auth-screen.hidden {
+                display: none;
             }
-            button { 
-                padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;
-                background: #007acc; color: white; margin-top: 5px;
+
+            .auth-container {
+                background: rgba(45, 45, 68, 0.9);
+                border-radius: 20px;
+                padding: 40px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+                max-width: 500px;
+                width: 100%;
+                border: 1px solid rgba(255, 255, 255, 0.1);
             }
-            button:hover { background: #005fa3; }
-            #header {
-                display: flex; align-items: center; justify-content: space-between;
+
+            .auth-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .auth-header img {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 20px;
+                animation: bounce 2s infinite;
+            }
+
+            .auth-header h1 {
+                font-size: 2em;
+                color: #00d4ff;
                 margin-bottom: 10px;
             }
-            #header img {
-                width: 40px; height: 40px; border-radius: 50%;
-                margin-right: 10px;
+
+            .auth-header p {
+                color: #b0b0b0;
+                font-size: 0.95em;
             }
-            #clear-btn {
-                background: red;
-                padding: 6px 10px;
-                font-weight: bold;
+
+            .auth-input-group {
+                margin: 25px 0;
             }
-            #disclaimer {
-                margin-top: 10px;
-                padding: 8px;
-                border-left: 4px solid #007acc;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 5px;
-            }
-            h3 {
-                color: #ffcc00;
-                margin: 5px 0;
-                font-size: 1.1em;
-            }
-            a {
-                color: #00aaff;
-                text-decoration: underline;
-                cursor: pointer;
+
+            .auth-input-group label {
                 display: block;
-                margin-top: 5px;
+                margin-bottom: 10px;
+                color: #00d4ff;
+                font-weight: 600;
             }
-            a:hover {
-                color: #0088cc;
+
+            .auth-input-group input {
+                width: 100%;
+                padding: 15px;
+                border-radius: 10px;
+                border: 2px solid rgba(0, 212, 255, 0.3);
+                background: rgba(30, 30, 46, 0.8);
+                color: white;
+                font-size: 1em;
+                transition: all 0.3s;
             }
+
+            .auth-input-group input:focus {
+                outline: none;
+                border-color: #00d4ff;
+                box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            }
+
+            .auth-button {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+                color: white;
+                font-size: 1.1em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+                margin-top: 10px;
+            }
+
+            .auth-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+            }
+
+            .auth-button:active {
+                transform: translateY(0);
+            }
+
+            #auth-message {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 10px;
+                text-align: center;
+                display: none;
+            }
+
+            #auth-message.success {
+                background: rgba(0, 212, 100, 0.2);
+                border: 1px solid #00d464;
+                color: #00ff88;
+            }
+
+            #auth-message.error {
+                background: rgba(255, 82, 82, 0.2);
+                border: 1px solid #ff5252;
+                color: #ff8888;
+            }
+
+            /* Chat Screen */
+            #chat-screen {
+                display: none;
+                animation: fadeIn 0.5s ease-in;
+            }
+
+            #chat-screen.active {
+                display: block;
+            }
+
+            #header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                background: rgba(45, 45, 68, 0.8);
+                padding: 15px 20px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            .header-left {
+                display: flex;
+                align-items: center;
+            }
+
+            #header img {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                margin-right: 15px;
+                border: 3px solid #00d4ff;
+            }
+
+            #header h2 {
+                color: #00d4ff;
+                font-size: 1.5em;
+            }
+
+            .header-buttons {
+                display: flex;
+                gap: 10px;
+            }
+
+            .header-button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+
+            #renew-btn {
+                background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+                color: white;
+            }
+
+            #renew-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+            }
+
+            #clear-btn {
+                background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
+                color: white;
+            }
+
+            #clear-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+            }
+
+            #disclaimer {
+                margin-bottom: 20px;
+                padding: 15px;
+                border-left: 4px solid #00d4ff;
+                background: rgba(0, 212, 255, 0.1);
+                border-radius: 8px;
+                font-size: 0.9em;
+            }
+
+            #disclaimer h3 {
+                color: #00d4ff;
+                margin-bottom: 8px;
+                font-size: 1em;
+            }
+
+            #chat-container {
+                display: flex;
+                flex-direction: column;
+                max-height: 500px;
+                overflow-y: auto;
+                padding: 20px;
+                border-radius: 15px;
+                background: rgba(30, 30, 46, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+                box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+
+            #chat-container::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            #chat-container::-webkit-scrollbar-track {
+                background: rgba(30, 30, 46, 0.5);
+                border-radius: 10px;
+            }
+
+            #chat-container::-webkit-scrollbar-thumb {
+                background: #00d4ff;
+                border-radius: 10px;
+            }
+
+            .message {
+                margin: 8px 0;
+                padding: 15px 20px;
+                border-radius: 15px;
+                max-width: 80%;
+                word-wrap: break-word;
+                animation: messageSlideIn 0.3s ease-out;
+            }
+
+            @keyframes messageSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .user {
+                background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+                align-self: flex-end;
+                text-align: right;
+                color: white;
+                box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            }
+
+            .ai {
+                background: rgba(68, 68, 85, 0.9);
+                align-self: flex-start;
+                text-align: left;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+
             .code-block {
-            position: relative;
-            background: #1e1e1e;
-            color: #dcdcdc;
-            border-radius: 10px;
-            margin: 1em 0;
+                position: relative;
+                background: #1a1a2e;
+                color: #dcdcdc;
+                border-radius: 10px;
+                margin: 1em 0;
+                padding: 15px;
+                border: 1px solid rgba(0, 212, 255, 0.3);
             }
 
             .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #007acc;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            cursor: pointer;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #00d4ff;
+                color: #1e1e2e;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.3s;
+            }
+
+            .copy-btn:hover {
+                background: #00ffff;
+                transform: scale(1.05);
+            }
+
+            pre {
+                background: transparent;
+                padding: 5px;
+                border-radius: 5px;
+                overflow-x: auto;
+                margin: 0;
+            }
+
+            code {
+                color: #00ffaa;
+                font-family: 'Courier New', monospace;
+            }
+
+            .input-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                background: rgba(45, 45, 68, 0.8);
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+
+            textarea {
+                width: 100%;
+                padding: 15px;
+                border-radius: 10px;
+                border: 2px solid rgba(0, 212, 255, 0.3);
+                background: rgba(30, 30, 46, 0.8);
+                color: white;
+                resize: none;
+                font-size: 1em;
+                min-height: 80px;
+                transition: all 0.3s;
+            }
+
+            textarea:focus {
+                outline: none;
+                border-color: #00d4ff;
+                box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            }
+
+            input[type="file"] {
+                padding: 10px;
+                border-radius: 10px;
+                border: 2px solid rgba(0, 212, 255, 0.3);
+                background: rgba(30, 30, 46, 0.8);
+                color: white;
+                cursor: pointer;
+            }
+
+            input[type="file"]::file-selector-button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                background: #00d4ff;
+                color: #1e1e2e;
+                font-weight: bold;
+                cursor: pointer;
+                margin-right: 10px;
+            }
+
+            input[type="file"]::file-selector-button:hover {
+                background: #00ffff;
+            }
+
+            .send-btn {
+                padding: 15px;
+                border: none;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+                color: white;
+                font-size: 1.1em;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .send-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+            }
+
+            .send-btn:active {
+                transform: translateY(0);
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
+            strong {
+                color: #00ffaa;
             }
         </style>
     </head>
     <body>
-        <div id="header">
-            <div style="display: flex; align-items: center;">
-                <img src="https://cdn-icons-png.flaticon.com/512/5511/5511666.png" alt="Monty Icon" />
-                <h2>Monty - AI Chat</h2>
+        <!-- Authentication Screen -->
+        <div id="auth-screen">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <img src="https://cdn-icons-png.flaticon.com/512/5511/5511666.png" alt="Monty Icon" />
+                    <h1>🐎 Welcome to Monty</h1>
+                    <p>Your ACS AI Assistant</p>
+                </div>
+                <div class="auth-input-group">
+                    <label for="special-code">Enter Your Special Code</label>
+                    <input type="password" id="special-code" placeholder="Enter your access code..." />
+                </div>
+                <button class="auth-button" onclick="authenticate()">Start Chat</button>
+                <div id="auth-message"></div>
             </div>
-            <button id="clear-btn" onclick="clearChat()">Clear Chat</button>
         </div>
 
-        <div id="disclaimer">
-            <h3>Important Disclaimer:</h3>
-            <a>Please be aware that the information provided here is based on an AI model. 
-            While I strive for accuracy, AI-generated content may contain errors. 
-            Always verify critical information with official documentation.</a>
-        </div>
+        <!-- Chat Screen -->
+        <div id="chat-screen">
+            <div id="header">
+                <div class="header-left">
+                    <img src="https://cdn-icons-png.flaticon.com/512/5511/5511666.png" alt="Monty Icon" />
+                    <h2>Monty AI Chat</h2>
+                </div>
+                <div class="header-buttons">
+                    <button id="renew-btn" class="header-button" onclick="renewCode()">Renew Code</button>
+                    <button id="clear-btn" class="header-button" onclick="clearChat()">Clear Chat</button>
+                </div>
+            </div>
 
-        <div id="chat-container"></div>
+            <div id="disclaimer">
+                <h3>⚠️ Important Disclaimer</h3>
+                <p>The information provided here is AI-generated. While I strive for accuracy, always verify critical information with official documentation.</p>
+            </div>
 
-        <!-- Input Area for Query & File -->
-        <div class="input-container">
-            <textarea id="message" placeholder="Ask Monty..." onkeydown="handleKeyPress(event)"></textarea>
-            <input type="file" id="fileUpload" accept=".pdf">
-            <button onclick="sendMessage()">Send</button>
+            <div id="chat-container"></div>
+
+            <div class="input-container">
+                <textarea id="message" placeholder="Ask Monty anything..." onkeydown="handleKeyPress(event)"></textarea>
+                <input type="file" id="fileUpload" accept=".pdf">
+                <button class="send-btn" onclick="sendMessage()">Send Message</button>
+            </div>
         </div>
 
         <script>
             const vscode = acquireVsCodeApi();
             let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+            let isAuthenticated = false;
 
+            // Authentication
+            function authenticate() {
+                const codeInput = document.getElementById('special-code');
+                const code = codeInput.value.trim();
+
+                if (!code) {
+                    showAuthMessage('Please enter your special code', 'error');
+                    return;
+                }
+
+                vscode.postMessage({
+                    command: 'authenticate',
+                    code: code
+                });
+            }
+
+            function showAuthMessage(text, type) {
+                const msgDiv = document.getElementById('auth-message');
+                msgDiv.textContent = text;
+                msgDiv.className = type;
+                msgDiv.style.display = 'block';
+            }
+
+            function showChatScreen() {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('chat-screen').classList.add('active');
+                isAuthenticated = true;
+                loadChatHistory();
+            }
+
+            // Renew Code
+            function renewCode() {
+                if (confirm('Do you want to renew your access code? Your old code will be invalidated.')) {
+                    vscode.postMessage({ command: 'renewCode' });
+                }
+            }
+
+            // Send Message
             function sendMessage() {
+                if (!isAuthenticated) {
+                    alert('Please authenticate first!');
+                    return;
+                }
+
                 const messageInput = document.getElementById('message');
                 const text = messageInput.value.trim();
                 const fileInput = document.getElementById('fileUpload');
                 const file = fileInput.files[0];
 
-                // Case 1: If both query and file are provided
                 if (file && text) {
                     const reader = new FileReader();
                     reader.onload = function(event) {
@@ -529,36 +1183,33 @@ function getWebviewContent() {
                             query: text
                         });
                         appendMessage(text, 'user');
-                        messageInput.value = '';  // Clear text area
-                        fileInput.value = '';  // Clear file input
+                        messageInput.value = '';
+                        fileInput.value = '';
                     };
                     reader.readAsDataURL(file);
                     return;
                 }
 
-                // Case 2: If only query is provided
                 if (text) {
                     appendMessage(text, 'user');
-                    messageInput.value = '';  // Clear text area
+                    messageInput.value = '';
                     vscode.postMessage({ command: 'sendMessage', text: text });
                     return;
                 }
 
-                // Case 3: If only file is uploaded without query
                 if (file) {
                     alert('Please enter a query along with the file.');
                     return;
                 }
 
-                // Case 4: If nothing is provided
-                alert('Please enter a query or upload a PDF.');
+                alert('Please enter a message or upload a PDF.');
             }
 
             function appendMessage(text, sender) {
                 const chatDiv = document.getElementById('chat-container');
                 const msgDiv = document.createElement('div');
                 msgDiv.className = sender + ' message';
-                
+
                 if (sender === 'ai') {
                     msgDiv.innerHTML = text;
                 } else {
@@ -572,12 +1223,45 @@ function getWebviewContent() {
                 localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
             }
 
+            function copyCode(button) {
+                const codeBlock = button.nextElementSibling.querySelector('code');
+                if (!codeBlock) return;
+
+                const textToCopy = codeBlock.textContent || '';
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    button.textContent = 'Copied!';
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                    }, 2000);
+                }).catch(err => {
+                    alert('Failed to copy: ' + err);
+                });
+            }
+
             window.addEventListener('message', event => {
                 const message = event.data;
+
+                if (message.command === 'authResult') {
+                    if (message.success) {
+                        showAuthMessage(message.message, 'success');
+                        setTimeout(() => {
+                            showChatScreen();
+                        }, 1000);
+                    } else {
+                        showAuthMessage(message.message, 'error');
+                    }
+                }
+
                 if (message.command === 'receiveMessage') {
                     appendMessage(message.text, 'ai');
-                } else if (message.command === 'clearChat') {
-                    clearChat();
+                }
+
+                if (message.command === 'codeRenewed') {
+                    alert(message.message);
+                }
+
+                if (message.command === 'renewError') {
+                    alert(message.message);
                 }
             });
 
@@ -586,10 +1270,11 @@ function getWebviewContent() {
             }
 
             function clearChat() {
-                document.getElementById('chat-container').innerHTML = '';
-                localStorage.removeItem('chatHistory');
-                chatHistory = [];
-                vscode.postMessage({ command: 'clearChat' });
+                if (confirm('Are you sure you want to clear the chat history?')) {
+                    document.getElementById('chat-container').innerHTML = '';
+                    localStorage.removeItem('chatHistory');
+                    chatHistory = [];
+                }
             }
 
             function handleKeyPress(event) {
@@ -599,7 +1284,12 @@ function getWebviewContent() {
                 }
             }
 
-            loadChatHistory();
+            // Allow Enter key in auth screen
+            document.getElementById('special-code')?.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    authenticate();
+                }
+            });
         </script>
     </body>
     </html>

@@ -140,7 +140,22 @@
         "key": "ctrl+F1",
         "when": "editorTextFocus"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "ACSPL+ Extension",
+      "properties": {
+        "acspl.firebaseServiceAccountPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Firebase service account JSON file for Monty chat authentication"
+        },
+        "acspl.firebaseDatabaseURL": {
+          "type": "string",
+          "default": "",
+          "description": "Firebase Realtime Database URL (e.g., https://your-project.firebaseio.com)"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -167,7 +182,10 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
     "axios": "^1.8.3",
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^13.6.0",
     "gcc": "^1.0.2",
     "gcc-min": "^7.3.0",
     "node-addon-api": "^5.0.0",
