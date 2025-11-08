@@ -3,8 +3,12 @@
 	  "target": "es6",
 	  "lib": ["es6", "dom"],
 	  "module": "commonjs",
+	  "outDir": "out",
+	  "rootDir": "src",
+	  "sourceMap": true,
 	  "strict": true,
 	  "esModuleInterop": true
-	}
+	},
+	"exclude": ["node_modules", ".vscode-test"]
   }
   

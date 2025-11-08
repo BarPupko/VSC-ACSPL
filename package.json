@@ -94,9 +94,19 @@
         "title": "Send email to the developer"
       },
       {
-        "command": "acspl.askAI",
+        "command": "acspl.aiAssistance",
         "category": "ACSPL+",
-        "title": "Ask For Monty's help"
+        "title": "AI Assistance"
+      },
+      {
+        "command": "acspl.createFirebaseUser",
+        "category": "ACSPL+",
+        "title": "Create Firebase User (Admin)"
+      },
+      {
+        "command": "acspl.monty",
+        "category": "ACSPL+",
+        "title": "Monty"
       }
     ],
     "languages": [

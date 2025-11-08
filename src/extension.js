@@ -63,11 +63,13 @@ const dotenv = __importStar(require("dotenv"));
 const envPath1 = path.join(__dirname, '..', '.env');
 const envPath2 = path.join(__dirname, '..', '..', '.env');
 const envPath3 = 'c:\\Projects\\VSC-ACSPL\\.env'; // Absolute fallback
+console.log('=== MONTY DEBUG: Environment Loading ===');
 console.log('__dirname:', __dirname);
 console.log('Trying env paths:', envPath1, envPath2, envPath3);
 if (fs.existsSync(envPath1)) {
     const result = dotenv.config({ path: envPath1 });
     console.log('✅ Loaded .env from:', envPath1);
+    console.log('CLAUDE_API_KEY after load:', process.env.CLAUDE_API_KEY ? `Found (${process.env.CLAUDE_API_KEY.substring(0, 20)}...)` : 'NOT FOUND');
     if (result.error) {
         console.error('❌ Error loading .env:', result.error);
     }
@@ -75,6 +77,7 @@ if (fs.existsSync(envPath1)) {
 else if (fs.existsSync(envPath2)) {
     const result = dotenv.config({ path: envPath2 });
     console.log('✅ Loaded .env from:', envPath2);
+    console.log('CLAUDE_API_KEY after load:', process.env.CLAUDE_API_KEY ? `Found (${process.env.CLAUDE_API_KEY.substring(0, 20)}...)` : 'NOT FOUND');
     if (result.error) {
         console.error('❌ Error loading .env:', result.error);
     }
@@ -82,6 +85,7 @@ else if (fs.existsSync(envPath2)) {
 else if (fs.existsSync(envPath3)) {
     const result = dotenv.config({ path: envPath3 });
     console.log('✅ Loaded .env from:', envPath3, '(fallback)');
+    console.log('CLAUDE_API_KEY after load:', process.env.CLAUDE_API_KEY ? `Found (${process.env.CLAUDE_API_KEY.substring(0, 20)}...)` : 'NOT FOUND');
     if (result.error) {
         console.error('❌ Error loading .env:', result.error);
     }
@@ -89,6 +93,7 @@ else if (fs.existsSync(envPath3)) {
 else {
     console.error('❌ .env file not found at:', envPath1, 'or', envPath2, 'or', envPath3);
 }
+console.log('=== END Environment Loading ===');
 // Firebase configuration and initialization
 let firebaseInitialized = false;
 function initializeFirebase(context) {
@@ -570,6 +575,148 @@ function activate(context) {
             console.error(err);
         }
     })));
+    // NEW AI Assistance Command - Enhanced Monty
+    context.subscriptions.push(vscode.commands.registerCommand("acspl.aiAssistance", () => __awaiter(this, void 0, void 0, function* () {
+        console.log('=== AI ASSISTANCE COMMAND TRIGGERED ===');
+        const panel = vscode.window.createWebviewPanel('aiAssistance', '🐎 Monty - AI Assistance', vscode.ViewColumn.One, { enableScripts: true });
+        let isAuthenticated = false;
+        let userCode = null;
+        panel.webview.html = getWebviewContent();
+        panel.webview.onDidReceiveMessage((message) => __awaiter(this, void 0, void 0, function* () {
+            const systemIntro = `You are Monty, a specialized Learning Coach focused on helping users master ACS Motion Control technologies, products, and concepts through company documentation.
+
+Core Skills:
+- Document-Based Learning: Extract and explain key concepts from ACS Motion Control documentation, cross-reference information, identify critical sections
+- Technical Concept Breakdown: Simplify motion control concepts (servo systems, motion controllers, programming, fieldbus protocols) into beginner, intermediate, and advanced levels
+- Skill Development & Practice: Create hands-on exercises, programming examples, configuration tasks, troubleshooting scenarios
+- Learning Process Optimization: Help define learning goals specific to ACS Motion Control (SPiiPlus programming, ACS controller configuration)
+
+ACS Motion Control Context:
+- Focus on motion controller products, servo drives, and related software
+- Emphasize practical applications in automation and industrial motion
+- Reference ACS-specific programming languages (ACSPL+) and tools
+- Connect learning to industry standards and best practices in motion control
+
+Interaction Guidelines:
+- Maintain a professional, technical yet approachable tone
+- Adapt explanations to the user's background
+- Provide step-by-step guidance when explaining complex procedures
+- Use examples directly from shared documentation whenever possible
+- Check understanding regularly with quick knowledge checks
+- Never provide external links - focus solely on the documentation provided`;
+            // Handle authentication
+            if (message.command === 'authenticate') {
+                const code = message.code.trim();
+                console.log('=== Authentication attempt ===');
+                // Check if Firebase is initialized
+                if (!firebaseInitialized) {
+                    console.error('Firebase not initialized');
+                    panel.webview.postMessage({
+                        command: 'authResult',
+                        success: false,
+                        message: '❌ Firebase authentication is not configured. Please contact your administrator.'
+                    });
+                    return;
+                }
+                // Verify code with Firebase
+                const isValid = yield verifySpecialCode(code);
+                console.log('Code validation result:', isValid);
+                if (isValid) {
+                    isAuthenticated = true;
+                    userCode = code;
+                    panel.webview.postMessage({
+                        command: 'authResult',
+                        success: true,
+                        message: '✅ Authentication successful! Welcome to AI Assistance.'
+                    });
+                    // Send welcome message
+                    panel.webview.postMessage({
+                        command: 'receiveMessage',
+                        text: `👋 Hello! I'm 🐎 Monty - Your ACS AI Assistant.\n\nHow can I help you today?`
+                    });
+                }
+                else {
+                    panel.webview.postMessage({
+                        command: 'authResult',
+                        success: false,
+                        message: '❌ Invalid special code. Please try again or contact support.'
+                    });
+                }
+            }
+            // Handle code renewal
+            if (message.command === 'renewCode') {
+                if (userCode && firebaseInitialized) {
+                    const newCode = yield renewUserCode(userCode);
+                    if (newCode) {
+                        userCode = newCode;
+                        panel.webview.postMessage({
+                            command: 'codeRenewed',
+                            newCode: newCode,
+                            message: `✅ Your new special code is: ${newCode}\n\nPlease save it securely!`
+                        });
+                    }
+                    else {
+                        panel.webview.postMessage({
+                            command: 'renewError',
+                            message: '❌ Failed to renew code. Please try again later.'
+                        });
+                    }
+                }
+                else {
+                    panel.webview.postMessage({
+                        command: 'renewError',
+                        message: '❌ Code renewal is not available.'
+                    });
+                }
+            }
+            // Handle chat messages (only if authenticated)
+            if (message.command === 'sendMessage') {
+                if (!isAuthenticated) {
+                    panel.webview.postMessage({
+                        command: 'receiveMessage',
+                        text: '❌ Please authenticate first to use the chat.'
+                    });
+                    return;
+                }
+                const userInput = message.text.trim();
+                console.log('=== Processing user message ===');
+                let response = "";
+                if (uploadedPdfText) {
+                    response = yield queryAIWithPdf(`${systemIntro}\n\n${userInput}`, uploadedPdfText);
+                }
+                else {
+                    response = yield getAIResponse(`${systemIntro}\n\n${userInput}`);
+                }
+                panel.webview.postMessage({ command: 'receiveMessage', text: response });
+            }
+            // Handle PDF upload (only if authenticated)
+            if (message.command === 'uploadPDF') {
+                if (!isAuthenticated) {
+                    panel.webview.postMessage({
+                        command: 'receiveMessage',
+                        text: '❌ Please authenticate first to upload PDFs.'
+                    });
+                    return;
+                }
+                const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64');
+                try {
+                    const pdfData = yield (0, pdf_parse_1.default)(pdfBuffer);
+                    uploadedPdfText = pdfData.text;
+                    if (message.query.trim()) {
+                        const response = yield queryAIWithPdf(`${systemIntro}\n\n${message.query}`, uploadedPdfText);
+                        panel.webview.postMessage({ command: 'receiveMessage', text: response });
+                    }
+                    else {
+                        panel.webview.postMessage({ command: 'receiveMessage', text: '✅ PDF uploaded successfully! Now enter a query.' });
+                    }
+                }
+                catch (error) {
+                    console.error("Error processing PDF:", error);
+                    panel.webview.postMessage({ command: 'receiveMessage', text: '❌ Error reading PDF. Please try again.' });
+                }
+            }
+        }));
+    })));
 } // end of activate function
 function queryAIWithPdf(query, pdfContent) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -580,9 +727,11 @@ function queryAIWithPdf(query, pdfContent) {
 // Function to get AI response from Claude
 function getAIResponse(userInput) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log('=== MONTY DEBUG: getAIResponse called ===');
         const apiKey = process.env.CLAUDE_API_KEY;
-        console.log('API Key check:', apiKey ? 'Found (length: ' + apiKey.length + ')' : 'NOT FOUND');
-        console.log('All env vars:', Object.keys(process.env).filter(k => k.includes('CLAUDE')));
+        console.log('API Key check:', apiKey ? `Found (length: ${apiKey.length}, starts with: ${apiKey.substring(0, 20)}...)` : 'NOT FOUND');
+        console.log('All env vars with CLAUDE:', Object.keys(process.env).filter(k => k.includes('CLAUDE')));
+        console.log('process.env.CLAUDE_API_KEY value:', process.env.CLAUDE_API_KEY ? 'EXISTS' : 'UNDEFINED');
         if (!apiKey) {
             return '❌ **Error:** Claude API key not configured. Please check your .env file.\n\nTried loading from: ' + path.join(__dirname, '..', '.env');
         }
