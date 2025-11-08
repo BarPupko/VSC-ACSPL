@@ -4,3 +4,4 @@ out
 .vscode-test/
 .env
 firebase-service-account.json
+.claude/settings.local.json
