@@ -2505,10 +2505,12 @@ function getWebviewContent(): string {
                 // Handle session deleted
                 if (message.command === 'sessionDeleted') {
                     // Clear chat if deleted session was current
-                    if (currentSessionId === message.sessionId) {
+                    const wasCurrentSession = (currentSessionId === message.sessionId);
+                    if (wasCurrentSession) {
                         document.getElementById('chat-container').innerHTML = '';
                         chatHistory = [];
                     }
+                    // Sessions list will be updated by sessionsLoaded message
                 }
 
                 // Handle delete error
@@ -3424,10 +3426,13 @@ function getMontyWebviewContent(): string {
 
                 // Handle session deleted
                 if (message.command === 'sessionDeleted') {
-                    if (currentSessionId === message.sessionId) {
+                    // Clear chat if deleted session was current
+                    const wasCurrentSession = (currentSessionId === message.sessionId);
+                    if (wasCurrentSession) {
                         document.getElementById('chat-container').innerHTML = '';
                         chatHistory = [];
                     }
+                    // Sessions list will be updated by sessionsLoaded message
                 }
 
                 // Handle delete error
