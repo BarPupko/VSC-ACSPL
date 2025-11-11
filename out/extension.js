@@ -152,7 +152,7 @@ function hashTimestamp(timestamp) {
 function generateSpecialCode() {
     return crypto.randomBytes(16).toString('hex');
 }
-// Verify special code with Firebase
+// Verify special code with Firebase - Updated for users/secretKey structure
 function verifySpecialCode(code) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('=== verifySpecialCode called ===');
@@ -165,22 +165,44 @@ function verifySpecialCode(code) {
         try {
             const db = admin.database();
             const usersRef = db.ref('users');
-            console.log('Querying Firebase for code:', code);
-            const snapshot = yield usersRef.orderByChild('specialCode').equalTo(code).once('value');
-            console.log('Snapshot exists:', snapshot.exists());
-            if (snapshot.exists()) {
-                const allUsers = snapshot.val();
-                console.log('Found users:', JSON.stringify(allUsers, null, 2));
-                const userData = Object.values(allUsers)[0];
-                console.log('User data:', JSON.stringify(userData, null, 2));
-                console.log('Is active:', userData.isActive);
-                return userData.isActive === true;
+            console.log('Querying Firebase users for secretKey:', code);
+            // Try orderByChild query first
+            let snapshot = yield usersRef.orderByChild('secretKey').equalTo(code).once('value');
+            console.log('Snapshot exists (orderByChild):', snapshot.exists());
+            // If not found with orderByChild, try getting all users and searching manually
+            if (!snapshot.exists()) {
+                console.log('Trying manual search through all users...');
+                const allUsersSnapshot = yield usersRef.once('value');
+                if (allUsersSnapshot.exists()) {
+                    const allUsers = allUsersSnapshot.val();
+                    console.log('Total users found:', Object.keys(allUsers).length);
+                    // Search for user with matching secretKey
+                    for (const [userId, userData] of Object.entries(allUsers)) {
+                        const user = userData;
+                        console.log(`Checking user ${userId}, secretKey:`, user.secretKey);
+                        if (user.secretKey === code) {
+                            console.log('Found matching user!');
+                            // No isActive field in database - just return true
+                            return true;
+                        }
+                    }
+                    console.log('No user found with secretKey after manual search');
+                }
+                else {
+                    console.log('No users collection found in database');
+                }
+                return false;
             }
-            console.log('No user found with code:', code);
-            return false;
+            const allUsers = snapshot.val();
+            console.log('Found users:', JSON.stringify(allUsers, null, 2));
+            const userData = Object.values(allUsers)[0];
+            console.log('User data:', JSON.stringify(userData, null, 2));
+            // User found with matching secretKey - return true (no isActive check)
+            return true;
         }
         catch (error) {
             console.error('Error verifying special code:', error);
+            console.error('Error details:', JSON.stringify(error, null, 2));
             return false;
         }
     });
@@ -250,7 +272,7 @@ function getUserIdFromCode(code) {
         try {
             const db = admin.database();
             const usersRef = db.ref('users');
-            const snapshot = yield usersRef.orderByChild('specialCode').equalTo(code).once('value');
+            const snapshot = yield usersRef.orderByChild('secretKey').equalTo(code).once('value');
             if (snapshot.exists()) {
                 return Object.keys(snapshot.val())[0];
             }
@@ -262,7 +284,7 @@ function getUserIdFromCode(code) {
         }
     });
 }
-// Create new chat session
+// Create new chat session - Updated to use chats collection
 function createChatSession(userId, sessionName) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!firebaseInitialized) {
@@ -270,7 +292,7 @@ function createChatSession(userId, sessionName) {
         }
         try {
             const db = admin.database();
-            const sessionsRef = db.ref(`chatSessions/${userId}`);
+            const sessionsRef = db.ref(`chats/${userId}`);
             const newSessionRef = sessionsRef.push();
             const sessionId = newSessionRef.key;
             yield newSessionRef.set({
@@ -295,14 +317,14 @@ function saveMessageToSession(userId, sessionId, role, content) {
         }
         try {
             const db = admin.database();
-            const messagesRef = db.ref(`chatSessions/${userId}/${sessionId}/messages`);
+            const messagesRef = db.ref(`chats/${userId}/${sessionId}/messages`);
             yield messagesRef.push({
                 role: role,
                 content: content,
                 timestamp: Date.now()
             });
             // Update last updated timestamp
-            yield db.ref(`chatSessions/${userId}/${sessionId}`).update({
+            yield db.ref(`chats/${userId}/${sessionId}`).update({
                 lastUpdated: Date.now()
             });
             return true;
@@ -321,7 +343,7 @@ function getUserSessions(userId) {
         }
         try {
             const db = admin.database();
-            const sessionsRef = db.ref(`chatSessions/${userId}`);
+            const sessionsRef = db.ref(`chats/${userId}`);
             const snapshot = yield sessionsRef.orderByChild('lastUpdated').once('value');
             if (snapshot.exists()) {
                 const sessions = [];
@@ -346,7 +368,7 @@ function getSessionMessages(userId, sessionId) {
         }
         try {
             const db = admin.database();
-            const messagesRef = db.ref(`chatSessions/${userId}/${sessionId}/messages`);
+            const messagesRef = db.ref(`chats/${userId}/${sessionId}/messages`);
             const snapshot = yield messagesRef.orderByChild('timestamp').once('value');
             if (snapshot.exists()) {
                 const messages = [];
@@ -371,7 +393,7 @@ function deleteSessionFromFirebase(userId, sessionId) {
         }
         try {
             const db = admin.database();
-            const sessionRef = db.ref(`chatSessions/${userId}/${sessionId}`);
+            const sessionRef = db.ref(`chats/${userId}/${sessionId}`);
             yield sessionRef.remove();
             return true;
         }
@@ -389,7 +411,7 @@ function updateSessionTitle(userId, sessionId, newTitle) {
         }
         try {
             const db = admin.database();
-            const sessionRef = db.ref(`chatSessions/${userId}/${sessionId}`);
+            const sessionRef = db.ref(`chats/${userId}/${sessionId}`);
             yield sessionRef.update({
                 sessionName: newTitle,
                 lastUpdated: Date.now()
@@ -846,288 +868,6 @@ function activate(context) {
             vscode.window.showErrorMessage("An error occurred while trying to open the email client.");
             console.error(err);
         }
-    })));
-    // NEW AI Assistance Command - Enhanced Monty
-    context.subscriptions.push(vscode.commands.registerCommand("acspl.aiAssistance", () => __awaiter(this, void 0, void 0, function* () {
-        console.log('=== AI ASSISTANCE COMMAND TRIGGERED ===');
-        const panel = vscode.window.createWebviewPanel('aiAssistance', '🐎 Monty - AI Assistance', vscode.ViewColumn.One, { enableScripts: true });
-        let isAuthenticated = false;
-        let userCode = null;
-        let userId = null;
-        let currentSessionId = null;
-        panel.webview.html = getWebviewContent();
-        panel.webview.onDidReceiveMessage((message) => __awaiter(this, void 0, void 0, function* () {
-            const systemIntro = `You are Monty, a specialized Learning Coach focused on helping users master ACS Motion Control technologies, products, and concepts through company documentation.
-
-Core Skills:
-- Document-Based Learning: Extract and explain key concepts from ACS Motion Control documentation, cross-reference information, identify critical sections
-- Technical Concept Breakdown: Simplify motion control concepts (servo systems, motion controllers, programming, fieldbus protocols) into beginner, intermediate, and advanced levels
-- Skill Development & Practice: Create hands-on exercises, programming examples, configuration tasks, troubleshooting scenarios
-- Learning Process Optimization: Help define learning goals specific to ACS Motion Control (SPiiPlus programming, ACS controller configuration)
-
-ACS Motion Control Context:
-- Focus on motion controller products, servo drives, and related software
-- Emphasize practical applications in automation and industrial motion
-- Reference ACS-specific programming languages (ACSPL+) and tools
-- Connect learning to industry standards and best practices in motion control
-
-ACSPL+ Programming Rules:
-- **CRITICAL**: Every ACSPL+ code example MUST end with the "STOP" command
-- STOP is mandatory - it terminates program execution
-- Example structure:
-  INT x = 10
-  VEL(0) = 1000
-  PTP(0), 100
-  STOP
-
-Interaction Guidelines:
-- Maintain a professional, technical yet approachable tone
-- Adapt explanations to the user's background
-- Provide step-by-step guidance when explaining complex procedures
-- Use examples directly from shared documentation whenever possible
-- Check understanding regularly with quick knowledge checks
-- Never provide external links - focus solely on the documentation provided
-- Always include STOP at the end of ACSPL+ code examples`;
-            // Handle access key request
-            if (message.command === 'requestKey') {
-                console.log('=== Access key request received ===');
-                const subject = encodeURIComponent("Access Key Request - Monty AI Assistant");
-                const body = encodeURIComponent("Hello,\n\nI would like to request an access key for Monty AI Assistant.\n\nThank you!");
-                const mailtoLink = `mailto:barp@acsmotioncontrol.com?subject=${subject}&body=${body}`;
-                vscode.env.openExternal(vscode.Uri.parse(mailtoLink));
-                return;
-            }
-            // Handle authentication
-            if (message.command === 'authenticate') {
-                const code = message.code.trim();
-                console.log('=== Authentication attempt ===');
-                // Check if Firebase is initialized
-                if (!firebaseInitialized) {
-                    console.error('Firebase not initialized');
-                    panel.webview.postMessage({
-                        command: 'authResult',
-                        success: false,
-                        message: '❌ Firebase authentication is not configured. Please contact your administrator.'
-                    });
-                    return;
-                }
-                // Verify code with Firebase
-                const isValid = yield verifySpecialCode(code);
-                console.log('Code validation result:', isValid);
-                if (isValid) {
-                    isAuthenticated = true;
-                    userCode = code;
-                    // Get user ID for session management
-                    userId = yield getUserIdFromCode(code);
-                    console.log('User ID:', userId);
-                    // Load user sessions
-                    if (userId) {
-                        // Create a new session automatically
-                        const sessionName = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-                        currentSessionId = yield createChatSession(userId, sessionName);
-                        console.log('Created new session:', currentSessionId);
-                        // Load sessions AFTER creating new one to include it in the list
-                        const sessions = yield getUserSessions(userId);
-                        console.log('Loaded sessions:', sessions.length);
-                        panel.webview.postMessage({
-                            command: 'sessionsLoaded',
-                            sessions: sessions,
-                            currentSessionId: currentSessionId
-                        });
-                    }
-                    panel.webview.postMessage({
-                        command: 'authResult',
-                        success: true,
-                        message: '✅ Authentication successful! Welcome to AI Assistance.'
-                    });
-                    // Send welcome message
-                    panel.webview.postMessage({
-                        command: 'receiveMessage',
-                        text: `👋 Hello! I'm 🐎 Monty - Your ACS AI Assistant.\n\nHow can I help you today?`
-                    });
-                }
-                else {
-                    panel.webview.postMessage({
-                        command: 'authResult',
-                        success: false,
-                        message: '❌ Invalid special code. Please try again or contact support.'
-                    });
-                }
-            }
-            // Handle code renewal
-            if (message.command === 'renewCode') {
-                if (userCode && firebaseInitialized) {
-                    const newCode = yield renewUserCode(userCode);
-                    if (newCode) {
-                        userCode = newCode;
-                        panel.webview.postMessage({
-                            command: 'codeRenewed',
-                            newCode: newCode,
-                            message: `✅ Your new special code is: ${newCode}\n\nPlease save it securely!`
-                        });
-                    }
-                    else {
-                        panel.webview.postMessage({
-                            command: 'renewError',
-                            message: '❌ Failed to renew code. Please try again later.'
-                        });
-                    }
-                }
-                else {
-                    panel.webview.postMessage({
-                        command: 'renewError',
-                        message: '❌ Code renewal is not available.'
-                    });
-                }
-            }
-            // Handle chat messages (only if authenticated)
-            if (message.command === 'sendMessage') {
-                if (!isAuthenticated) {
-                    panel.webview.postMessage({
-                        command: 'receiveMessage',
-                        text: '❌ Please authenticate first to use the chat.'
-                    });
-                    return;
-                }
-                const userInput = message.text.trim();
-                console.log('=== Processing user message ===');
-                // Check if this is the first message in the session
-                let isFirstMessage = false;
-                if (userId && currentSessionId) {
-                    const existingMessages = yield getSessionMessages(userId, currentSessionId);
-                    isFirstMessage = existingMessages.length === 0;
-                }
-                // Save user message to Firebase
-                if (userId && currentSessionId) {
-                    yield saveMessageToSession(userId, currentSessionId, 'user', userInput);
-                    // Auto-generate title from first message
-                    if (isFirstMessage) {
-                        const newTitle = generateTitleFromMessage(userInput);
-                        yield updateSessionTitle(userId, currentSessionId, newTitle);
-                        // Refresh sessions list to show new title
-                        const sessions = yield getUserSessions(userId);
-                        panel.webview.postMessage({
-                            command: 'sessionsLoaded',
-                            sessions: sessions,
-                            currentSessionId: currentSessionId
-                        });
-                    }
-                }
-                let response = "";
-                if (uploadedPdfText) {
-                    response = yield queryAIWithPdf(`${systemIntro}\n\n${userInput}`, uploadedPdfText);
-                }
-                else {
-                    response = yield getAIResponse(`${systemIntro}\n\n${userInput}`);
-                }
-                // Save AI response to Firebase
-                if (userId && currentSessionId) {
-                    yield saveMessageToSession(userId, currentSessionId, 'assistant', response);
-                }
-                panel.webview.postMessage({ command: 'receiveMessage', text: response });
-            }
-            // Handle PDF upload (only if authenticated)
-            if (message.command === 'uploadPDF') {
-                if (!isAuthenticated) {
-                    panel.webview.postMessage({
-                        command: 'receiveMessage',
-                        text: '❌ Please authenticate first to upload PDFs.'
-                    });
-                    return;
-                }
-                const pdfBuffer = Buffer.from(message.content.split(',')[1], 'base64');
-                try {
-                    const pdfData = yield (0, pdf_parse_1.default)(pdfBuffer);
-                    uploadedPdfText = pdfData.text;
-                    if (message.query.trim()) {
-                        const response = yield queryAIWithPdf(`${systemIntro}\n\n${message.query}`, uploadedPdfText);
-                        panel.webview.postMessage({ command: 'receiveMessage', text: response });
-                    }
-                    else {
-                        panel.webview.postMessage({ command: 'receiveMessage', text: '✅ PDF uploaded successfully! Now enter a query.' });
-                    }
-                }
-                catch (error) {
-                    console.error("Error processing PDF:", error);
-                    panel.webview.postMessage({ command: 'receiveMessage', text: '❌ Error reading PDF. Please try again.' });
-                }
-            }
-            // Handle new session creation
-            if (message.command === 'newSession') {
-                if (userId) {
-                    const sessionName = message.name || `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-                    currentSessionId = yield createChatSession(userId, sessionName);
-                    const sessions = yield getUserSessions(userId);
-                    panel.webview.postMessage({
-                        command: 'sessionsLoaded',
-                        sessions: sessions,
-                        currentSessionId: currentSessionId
-                    });
-                    panel.webview.postMessage({
-                        command: 'sessionCreated',
-                        sessionId: currentSessionId
-                    });
-                }
-            }
-            // Handle load session
-            if (message.command === 'loadSession') {
-                if (userId && message.sessionId && currentSessionId) {
-                    currentSessionId = message.sessionId;
-                    const messages = yield getSessionMessages(userId, message.sessionId);
-                    panel.webview.postMessage({
-                        command: 'sessionLoaded',
-                        sessionId: message.sessionId,
-                        messages: messages
-                    });
-                }
-            }
-            // Handle clear chat (same as new session)
-            if (message.command === 'clearChat') {
-                if (userId) {
-                    const sessionName = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-                    currentSessionId = yield createChatSession(userId, sessionName);
-                    const sessions = yield getUserSessions(userId);
-                    panel.webview.postMessage({
-                        command: 'sessionsLoaded',
-                        sessions: sessions,
-                        currentSessionId: currentSessionId
-                    });
-                    panel.webview.postMessage({
-                        command: 'chatCleared'
-                    });
-                }
-            }
-            // Handle delete session
-            if (message.command === 'deleteSession') {
-                if (userId && message.sessionId) {
-                    const success = yield deleteSessionFromFirebase(userId, message.sessionId);
-                    if (success) {
-                        // If deleted session was current, create new session
-                        if (currentSessionId === message.sessionId) {
-                            const sessionName = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-                            currentSessionId = yield createChatSession(userId, sessionName);
-                        }
-                        // Refresh sessions list
-                        const sessions = yield getUserSessions(userId);
-                        panel.webview.postMessage({
-                            command: 'sessionsLoaded',
-                            sessions: sessions,
-                            currentSessionId: currentSessionId
-                        });
-                        panel.webview.postMessage({
-                            command: 'sessionDeleted',
-                            sessionId: message.sessionId
-                        });
-                    }
-                    else {
-                        panel.webview.postMessage({
-                            command: 'deleteError',
-                            message: '❌ Failed to delete session. Please try again.'
-                        });
-                    }
-                }
-            }
-        }));
     })));
     context.subscriptions.push(vscode.commands.registerCommand("acspl.monty", () => __awaiter(this, void 0, void 0, function* () {
         console.log('=== MONTY COMMAND TRIGGERED ===');
@@ -2325,10 +2065,12 @@ function getWebviewContent() {
                 // Handle session deleted
                 if (message.command === 'sessionDeleted') {
                     // Clear chat if deleted session was current
-                    if (currentSessionId === message.sessionId) {
+                    const wasCurrentSession = (currentSessionId === message.sessionId);
+                    if (wasCurrentSession) {
                         document.getElementById('chat-container').innerHTML = '';
                         chatHistory = [];
                     }
+                    // Sessions list will be updated by sessionsLoaded message
                 }
 
                 // Handle delete error
@@ -3243,10 +2985,13 @@ function getMontyWebviewContent() {
 
                 // Handle session deleted
                 if (message.command === 'sessionDeleted') {
-                    if (currentSessionId === message.sessionId) {
+                    // Clear chat if deleted session was current
+                    const wasCurrentSession = (currentSessionId === message.sessionId);
+                    if (wasCurrentSession) {
                         document.getElementById('chat-container').innerHTML = '';
                         chatHistory = [];
                     }
+                    // Sessions list will be updated by sessionsLoaded message
                 }
 
                 // Handle delete error

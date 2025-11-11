@@ -94,11 +94,6 @@
         "title": "Send email to the developer"
       },
       {
-        "command": "acspl.aiAssistance",
-        "category": "ACSPL+",
-        "title": "AI Assistance"
-      },
-      {
         "command": "acspl.createFirebaseUser",
         "category": "ACSPL+",
         "title": "Create Firebase User (Admin)"
