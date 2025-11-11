@@ -115,7 +115,7 @@ function generateSpecialCode(): string {
     return crypto.randomBytes(16).toString('hex');
 }
 
-// Verify special code with Firebase
+// Verify special code with Firebase - Updated for users/secretKey structure
 async function verifySpecialCode(code: string): Promise<boolean> {
     console.log('=== verifySpecialCode called ===');
     console.log('Code to verify:', code);
@@ -129,24 +129,48 @@ async function verifySpecialCode(code: string): Promise<boolean> {
     try {
         const db = admin.database();
         const usersRef = db.ref('users');
-        console.log('Querying Firebase for code:', code);
+        console.log('Querying Firebase users for secretKey:', code);
 
-        const snapshot = await usersRef.orderByChild('specialCode').equalTo(code).once('value');
-        console.log('Snapshot exists:', snapshot.exists());
+        // Try orderByChild query first
+        let snapshot = await usersRef.orderByChild('secretKey').equalTo(code).once('value');
+        console.log('Snapshot exists (orderByChild):', snapshot.exists());
 
-        if (snapshot.exists()) {
-            const allUsers = snapshot.val();
-            console.log('Found users:', JSON.stringify(allUsers, null, 2));
-            const userData = Object.values(allUsers)[0] as any;
-            console.log('User data:', JSON.stringify(userData, null, 2));
-            console.log('Is active:', userData.isActive);
-            return userData.isActive === true;
+        // If not found with orderByChild, try getting all users and searching manually
+        if (!snapshot.exists()) {
+            console.log('Trying manual search through all users...');
+            const allUsersSnapshot = await usersRef.once('value');
+
+            if (allUsersSnapshot.exists()) {
+                const allUsers = allUsersSnapshot.val();
+                console.log('Total users found:', Object.keys(allUsers).length);
+
+                // Search for user with matching secretKey
+                for (const [userId, userData] of Object.entries(allUsers as any)) {
+                    const user = userData as any;
+                    console.log(`Checking user ${userId}, secretKey:`, user.secretKey);
+                    if (user.secretKey === code) {
+                        console.log('Found matching user!');
+                        // No isActive field in database - just return true
+                        return true;
+                    }
+                }
+                console.log('No user found with secretKey after manual search');
+            } else {
+                console.log('No users collection found in database');
+            }
+            return false;
         }
 
-        console.log('No user found with code:', code);
-        return false;
+        const allUsers = snapshot.val();
+        console.log('Found users:', JSON.stringify(allUsers, null, 2));
+        const userData = Object.values(allUsers)[0] as any;
+        console.log('User data:', JSON.stringify(userData, null, 2));
+
+        // User found with matching secretKey - return true (no isActive check)
+        return true;
     } catch (error) {
         console.error('Error verifying special code:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
         return false;
     }
 }
@@ -220,7 +244,7 @@ async function getUserIdFromCode(code: string): Promise<string | null> {
     try {
         const db = admin.database();
         const usersRef = db.ref('users');
-        const snapshot = await usersRef.orderByChild('specialCode').equalTo(code).once('value');
+        const snapshot = await usersRef.orderByChild('secretKey').equalTo(code).once('value');
 
         if (snapshot.exists()) {
             return Object.keys(snapshot.val())[0];
@@ -232,7 +256,7 @@ async function getUserIdFromCode(code: string): Promise<string | null> {
     }
 }
 
-// Create new chat session
+// Create new chat session - Updated to use chats collection
 async function createChatSession(userId: string, sessionName: string): Promise<string | null> {
     if (!firebaseInitialized) {
         return null;
@@ -240,7 +264,7 @@ async function createChatSession(userId: string, sessionName: string): Promise<s
 
     try {
         const db = admin.database();
-        const sessionsRef = db.ref(`chatSessions/${userId}`);
+        const sessionsRef = db.ref(`chats/${userId}`);
         const newSessionRef = sessionsRef.push();
 
         const sessionId = newSessionRef.key;
@@ -266,7 +290,7 @@ async function saveMessageToSession(userId: string, sessionId: string, role: 'us
 
     try {
         const db = admin.database();
-        const messagesRef = db.ref(`chatSessions/${userId}/${sessionId}/messages`);
+        const messagesRef = db.ref(`chats/${userId}/${sessionId}/messages`);
 
         await messagesRef.push({
             role: role,
@@ -275,7 +299,7 @@ async function saveMessageToSession(userId: string, sessionId: string, role: 'us
         });
 
         // Update last updated timestamp
-        await db.ref(`chatSessions/${userId}/${sessionId}`).update({
+        await db.ref(`chats/${userId}/${sessionId}`).update({
             lastUpdated: Date.now()
         });
 
@@ -294,7 +318,7 @@ async function getUserSessions(userId: string): Promise<any[]> {
 
     try {
         const db = admin.database();
-        const sessionsRef = db.ref(`chatSessions/${userId}`);
+        const sessionsRef = db.ref(`chats/${userId}`);
         const snapshot = await sessionsRef.orderByChild('lastUpdated').once('value');
 
         if (snapshot.exists()) {
@@ -322,7 +346,7 @@ async function getSessionMessages(userId: string, sessionId: string): Promise<an
 
     try {
         const db = admin.database();
-        const messagesRef = db.ref(`chatSessions/${userId}/${sessionId}/messages`);
+        const messagesRef = db.ref(`chats/${userId}/${sessionId}/messages`);
         const snapshot = await messagesRef.orderByChild('timestamp').once('value');
 
         if (snapshot.exists()) {
@@ -347,7 +371,7 @@ async function deleteSessionFromFirebase(userId: string, sessionId: string): Pro
 
     try {
         const db = admin.database();
-        const sessionRef = db.ref(`chatSessions/${userId}/${sessionId}`);
+        const sessionRef = db.ref(`chats/${userId}/${sessionId}`);
         await sessionRef.remove();
         return true;
     } catch (error) {
@@ -364,7 +388,7 @@ async function updateSessionTitle(userId: string, sessionId: string, newTitle: s
 
     try {
         const db = admin.database();
-        const sessionRef = db.ref(`chatSessions/${userId}/${sessionId}`);
+        const sessionRef = db.ref(`chats/${userId}/${sessionId}`);
         await sessionRef.update({
             sessionName: newTitle,
             lastUpdated: Date.now()
