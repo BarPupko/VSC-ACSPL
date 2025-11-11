@@ -1218,6 +1218,12 @@ Interaction Guidelines:
                     panel.webview.postMessage({
                         command: 'chatCleared'
                     });
+
+                    // Send welcome message for new chat
+                    panel.webview.postMessage({
+                        command: 'receiveMessage',
+                        text: '✨ New chat started! Your previous chat has been saved to the sidebar.\n\n👋 How can I help you today?'
+                    });
                 }
             }
 
