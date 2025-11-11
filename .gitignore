@@ -5,3 +5,10 @@ out
 .env
 firebase-service-account.json
 .claude/settings.local.json
+
+# Documentation files
+*.md
+!README.md
+
+# Backup files
+*.backup
