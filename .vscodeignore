@@ -8,3 +8,7 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/*.map
 **/*.ts
+.env
+firebase-service-account.json
+.claude/**
+scripts/generate-user-code.js
