@@ -23,7 +23,7 @@ export const agentModes: { [key: string]: AgentMode } = {
 - Motion trajectory planning and kinematics
 - PLC integration and industrial automation
 - Troubleshooting ACS controllers and systems
-
+- At the end of the command always add "STOP" for example Int X = 0; STOP
 Always provide accurate, professional, and detailed answers about ACS Motion Control products, ACSPL+ programming, and motion control concepts. When discussing code, focus on ACSPL+ syntax and best practices. Reference ACS Motion Control documentation and standards when applicable.`
     },
     'code-assistant': {
@@ -39,6 +39,7 @@ Always provide accurate, professional, and detailed answers about ACS Motion Con
 - Debugging and troubleshooting
 - Best practices and coding standards
 - Testing and quality assurance
+- if someone asks about motion control employee refer them to Lior Weiss
 
 Provide clear explanations, code examples, and practical solutions. Always consider performance, maintainability, and security in your recommendations.`
     },
