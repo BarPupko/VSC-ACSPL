@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as admin from 'firebase-admin';
 import Anthropic from '@anthropic-ai/sdk';
 import { themes, MontyTheme } from './montyThemes';
+import { agentModes, AgentMode } from './montyAgentModes';
 
 // Firebase helper functions
 async function verifySpecialCode(code: string): Promise<boolean> {
@@ -576,8 +577,9 @@ export function registerMontyAI(context: vscode.ExtensionContext, firebaseInitia
 }
 
 function getMontyWebviewContent(): string {
-    // Get all themes for the selector
+    // Get all themes and agent modes for the selectors
     const themesData = JSON.stringify(Object.values(themes));
+    const agentModesData = JSON.stringify(Object.values(agentModes));
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -1139,13 +1141,20 @@ function getMontyWebviewContent(): string {
             transform: scale(1.05);
         }
 
-        /* Theme Selector Styles */
-        .theme-selector {
+        /* Header Left Controls */
+        .header-left-controls {
             position: absolute;
             left: 24px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+        }
+
+        /* Theme Selector Styles */
+        .theme-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .theme-button {
@@ -1212,6 +1221,111 @@ function getMontyWebviewContent(): string {
             color: white;
             font-weight: 600;
         }
+
+        /* Agent Mode Selector Styles */
+        .agent-mode-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .agent-mode-button {
+            padding: 8px 16px;
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agent-mode-button:hover {
+            background: var(--input-bg);
+            transform: scale(1.05);
+        }
+
+        .agent-mode-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 250px;
+            display: none;
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .agent-mode-dropdown.show {
+            display: block;
+        }
+
+        .agent-mode-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid var(--input-border);
+            color: var(--primary-text);
+        }
+
+        .agent-mode-option:last-child {
+            border-bottom: none;
+        }
+
+        .agent-mode-option:hover {
+            background: var(--session-item-hover);
+        }
+
+        .agent-mode-option.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .mode-option-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .mode-option-description {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* New Chat Button */
+        .new-chat-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
+            color: var(--button-text);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .new-chat-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .new-chat-button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -1235,14 +1349,28 @@ function getMontyWebviewContent(): string {
 
         <div id="main-chat">
             <div id="chat-header">
-                <div class="theme-selector">
-                    <button class="theme-button" id="theme-button">
-                        <span id="current-theme-flag">🇮🇱</span>
-                        <span id="current-theme-name">ACS - Israel Light</span>
-                    </button>
-                    <div class="theme-dropdown" id="theme-dropdown">
-                        <!-- Theme options will be populated by JavaScript -->
+                <div class="header-left-controls">
+                    <div class="theme-selector">
+                        <button class="theme-button" id="theme-button">
+                            <span id="current-theme-flag">🇮🇱</span>
+                            <span id="current-theme-name">ACS - Israel Light</span>
+                        </button>
+                        <div class="theme-dropdown" id="theme-dropdown">
+                            <!-- Theme options will be populated by JavaScript -->
+                        </div>
                     </div>
+                    <div class="agent-mode-selector">
+                        <button class="agent-mode-button" id="agent-mode-button">
+                            <span id="current-mode-icon">⚙️</span>
+                            <span id="current-mode-name">Motion Control</span>
+                        </button>
+                        <div class="agent-mode-dropdown" id="agent-mode-dropdown">
+                            <!-- Agent mode options will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    <button class="new-chat-button" id="new-chat-button" title="Start new chat">
+                        ➕ New Chat
+                    </button>
                 </div>
                 <div class="header-title">
                     <span class="header-emoji">🐴</span> Monty AI
@@ -1274,9 +1402,11 @@ function getMontyWebviewContent(): string {
         let uploadedPdfText = null;
         let uploadedPdfName = null;
         let currentTheme = 'israel-light';
+        let currentAgentMode = 'motion-control';
 
-        // Available themes
+        // Available themes and agent modes
         const availableThemes = ${themesData};
+        const availableAgentModes = ${agentModesData};
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
 
@@ -1383,19 +1513,78 @@ function getMontyWebviewContent(): string {
             document.getElementById('theme-dropdown').classList.remove('show');
         }
 
-        // Theme button toggle
-        document.getElementById('theme-button').addEventListener('click', () => {
-            document.getElementById('theme-dropdown').classList.toggle('show');
-        });
-
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.theme-selector')) {
                 document.getElementById('theme-dropdown').classList.remove('show');
             }
+            if (!e.target.closest('.agent-mode-selector')) {
+                document.getElementById('agent-mode-dropdown').classList.remove('show');
+            }
         });
 
-        // Load saved theme from localStorage
+        // Initialize agent mode selector
+        function initializeAgentModeSelector() {
+            const modeDropdown = document.getElementById('agent-mode-dropdown');
+
+            availableAgentModes.forEach(mode => {
+                const option = document.createElement('div');
+                option.className = 'agent-mode-option';
+                if (mode.name === currentAgentMode) {
+                    option.classList.add('active');
+                }
+                option.innerHTML = \`
+                    <div class="mode-option-header">
+                        <span>\${mode.icon}</span>
+                        <span>\${mode.displayName}</span>
+                    </div>
+                    <div class="mode-option-description">\${mode.description}</div>
+                \`;
+                option.onclick = () => selectAgentMode(mode);
+                modeDropdown.appendChild(option);
+            });
+        }
+
+        // Select agent mode function
+        function selectAgentMode(mode) {
+            currentAgentMode = mode.name;
+
+            // Update current mode display
+            document.getElementById('current-mode-icon').textContent = mode.icon;
+            document.getElementById('current-mode-name').textContent = mode.displayName.replace(' Expert', '').replace(' Assistant', '').replace(' Information', '');
+
+            // Update active state in dropdown
+            document.querySelectorAll('.agent-mode-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            event.target.closest('.agent-mode-option').classList.add('active');
+
+            // Save agent mode and its system prompt to localStorage
+            localStorage.setItem('monty-agent-mode', mode.name);
+            localStorage.setItem('monty-agent-prompt', mode.systemPrompt);
+
+            // Close dropdown
+            document.getElementById('agent-mode-dropdown').classList.remove('show');
+        }
+
+        // Agent mode button toggle
+        document.getElementById('agent-mode-button').addEventListener('click', () => {
+            document.getElementById('agent-mode-dropdown').classList.toggle('show');
+            document.getElementById('theme-dropdown').classList.remove('show');
+        });
+
+        // Theme button toggle (update to close agent mode dropdown)
+        document.getElementById('theme-button').addEventListener('click', () => {
+            document.getElementById('theme-dropdown').classList.toggle('show');
+            document.getElementById('agent-mode-dropdown').classList.remove('show');
+        });
+
+        // New chat button handler
+        document.getElementById('new-chat-button').addEventListener('click', () => {
+            vscode.postMessage({ command: 'clearChat' });
+        });
+
+        // Load saved theme and agent mode from localStorage
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('monty-theme');
             if (savedTheme) {
@@ -1405,7 +1594,26 @@ function getMontyWebviewContent(): string {
                     applyTheme(theme);
                 }
             }
+
+            const savedAgentMode = localStorage.getItem('monty-agent-mode');
+            if (savedAgentMode) {
+                const mode = availableAgentModes.find(m => m.name === savedAgentMode);
+                if (mode) {
+                    currentAgentMode = savedAgentMode;
+                    document.getElementById('current-mode-icon').textContent = mode.icon;
+                    document.getElementById('current-mode-name').textContent = mode.displayName.replace(' Expert', '').replace(' Assistant', '').replace(' Information', '');
+                    localStorage.setItem('monty-agent-prompt', mode.systemPrompt);
+                }
+            } else {
+                // Set default agent mode prompt
+                const defaultMode = availableAgentModes.find(m => m.name === 'motion-control');
+                if (defaultMode) {
+                    localStorage.setItem('monty-agent-prompt', defaultMode.systemPrompt);
+                }
+            }
+
             initializeThemeSelector();
+            initializeAgentModeSelector();
         });
 
         document.getElementById('auth-button').addEventListener('click', () => {
@@ -1470,7 +1678,19 @@ function getMontyWebviewContent(): string {
             if (text) {
                 addMessage(text, 'user');
 
-                const systemPrompt = localStorage.getItem('monty-system-prompt') || 'You are a helpful AI assistant.';
+                // Combine agent mode prompt with language-specific instructions from theme
+                const agentPrompt = localStorage.getItem('monty-agent-prompt') || 'You are a helpful AI assistant.';
+                const themePrompt = localStorage.getItem('monty-system-prompt') || '';
+
+                // Agent mode prompt takes priority, but include language preference from theme
+                let systemPrompt = agentPrompt;
+                if (themePrompt && themePrompt.includes('respond in')) {
+                    // Extract language preference from theme prompt
+                    const languageMatch = themePrompt.match(/respond in (\w+)/i);
+                    if (languageMatch) {
+                        systemPrompt += \`\n\nIMPORTANT: Always respond in \${languageMatch[1]} unless the user requests otherwise.\`;
+                    }
+                }
 
                 if (uploadedPdfText) {
                     vscode.postMessage({
