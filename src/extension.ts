@@ -14,6 +14,7 @@ import * as admin from 'firebase-admin'; // Firebase Admin SDK
 import Anthropic from '@anthropic-ai/sdk';
 import * as dotenv from 'dotenv';
 import { registerMontyAI } from './monty';
+import { ACSPLSnippetProvider } from './acsplSnippetProvider';
 
 // Load environment variables - try multiple paths
 const envPath1 = path.join(__dirname, '..', '.env');
@@ -684,6 +685,15 @@ export function activate(context: vscode.ExtensionContext) {
             { language: 'acsplext' },
             new VariableCompletionProvider(),
             ' ', '\t', '=', '('  // Adjust triggers for your syntax
+        )
+    );
+
+    // Register ACSPL+ snippet provider with icons
+    context.subscriptions.push(
+        vscode.languages.registerCompletionItemProvider(
+            { language: 'acsplext' },
+            new ACSPLSnippetProvider(),
+            'L', 'I', 'W', 'F', 'S', 'e', 'G', 'c', 'O', 'N', 'X', 'A', 'f', 'd', '1', '2', '_'  // Common triggers for snippet prefixes
         )
     );
 

@@ -58,6 +58,7 @@ const admin = __importStar(require("firebase-admin")); // Firebase Admin SDK
 const sdk_1 = __importDefault(require("@anthropic-ai/sdk"));
 const dotenv = __importStar(require("dotenv"));
 const monty_1 = require("./monty");
+const acsplSnippetProvider_1 = require("./acsplSnippetProvider");
 // Load environment variables - try multiple paths
 const envPath1 = path.join(__dirname, '..', '.env');
 const envPath2 = path.join(__dirname, '..', '..', '.env');
@@ -671,6 +672,9 @@ function activate(context) {
         }
     })));
     context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'acsplext' }, new VariableCompletionProvider(), ' ', '\t', '=', '(' // Adjust triggers for your syntax
+    ));
+    // Register ACSPL+ snippet provider with icons
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'acsplext' }, new acsplSnippetProvider_1.ACSPLSnippetProvider(), 'L', 'I', 'W', 'F', 'S', 'e', 'G', 'c', 'O', 'N', 'X', 'A', 'f', 'd', '1', '2', '_' // Common triggers for snippet prefixes
     ));
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
