@@ -1,0 +1,87 @@
+{
+  "name": "ACS - Israel Light",
+  "type": "light",
+  "colors": {
+    "editor.background": "#f0f8ff",
+    "editor.foreground": "#1e3a5f",
+    "activityBar.background": "#e6f4ff",
+    "activityBar.foreground": "#0047ab",
+    "activityBarBadge.background": "#0047ab",
+    "activityBarBadge.foreground": "#ffffff",
+    "sideBar.background": "#e6f4ff",
+    "sideBar.foreground": "#1e3a5f",
+    "sideBarTitle.foreground": "#0047ab",
+    "statusBar.background": "#0047ab",
+    "statusBar.foreground": "#ffffff",
+    "titleBar.activeBackground": "#0047ab",
+    "titleBar.activeForeground": "#ffffff",
+    "titleBar.inactiveBackground": "#d1e5ff",
+    "titleBar.inactiveForeground": "#4a6fa5",
+    "button.background": "#0047ab",
+    "button.foreground": "#ffffff",
+    "button.hoverBackground": "#0066cc",
+    "input.background": "#f8fbff",
+    "input.border": "#d1e5ff",
+    "input.foreground": "#1e3a5f",
+    "inputOption.activeBorder": "#0047ab",
+    "list.activeSelectionBackground": "#d1e5ff",
+    "list.activeSelectionForeground": "#0047ab",
+    "list.hoverBackground": "#e6f4ff",
+    "list.inactiveSelectionBackground": "#e6f4ff",
+    "tab.activeBackground": "#f0f8ff",
+    "tab.activeForeground": "#0047ab",
+    "tab.inactiveBackground": "#d1e5ff",
+    "tab.inactiveForeground": "#4a6fa5",
+    "editorGroupHeader.tabsBackground": "#e6f4ff",
+    "panel.background": "#f0f8ff",
+    "panel.border": "#d1e5ff",
+    "terminal.ansiBlue": "#0047ab",
+    "terminal.ansiBrightBlue": "#0066cc"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment"],
+      "settings": {
+        "foreground": "#80c1ff",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": ["keyword", "storage.type", "storage.modifier"],
+      "settings": {
+        "foreground": "#0047ab",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": ["string"],
+      "settings": {
+        "foreground": "#0066cc"
+      }
+    },
+    {
+      "scope": ["constant.numeric", "constant.language"],
+      "settings": {
+        "foreground": "#003d99"
+      }
+    },
+    {
+      "scope": ["entity.name.function", "support.function"],
+      "settings": {
+        "foreground": "#0047ab"
+      }
+    },
+    {
+      "scope": ["entity.name.type", "entity.name.class"],
+      "settings": {
+        "foreground": "#003d99"
+      }
+    },
+    {
+      "scope": ["variable"],
+      "settings": {
+        "foreground": "#1e3a5f"
+      }
+    }
+  ]
+}

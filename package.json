@@ -94,11 +94,6 @@
         "title": "Send email to the developer"
       },
       {
-        "command": "acspl.monty",
-        "category": "ACSPL+",
-        "title": "Monty"
-      },
-      {
         "command": "acspl.montyAI",
         "category": "ACSPL+",
         "title": "Monty AI"
