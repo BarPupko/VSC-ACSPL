@@ -33,19 +33,22 @@
         "language": "c"
       }
     ],
-    "contributes": {
-      "themes": [
-        {
-          "label": "MyTheme",
-          "uiTheme": "vs-dark",
-          "path": "./themes/my-theme.json"
-        }
-      ],
-      "semanticTokenColors": {
-        "variable": "#4FC1FF",
-        "keyword": "#FF00FF",
-        "type": "#9CDCFE"
+    "themes": [
+      {
+        "label": "MyTheme",
+        "uiTheme": "vs-dark",
+        "path": "./themes/my-theme.json"
+      },
+      {
+        "label": "ACS - Cozy Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/acs-cozy-dark-color-theme.json"
       }
+    ],
+    "semanticTokenColors": {
+      "variable": "#4FC1FF",
+      "keyword": "#FF00FF",
+      "type": "#9CDCFE"
     },
     "commands": [
       {

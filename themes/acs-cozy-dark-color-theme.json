@@ -1,0 +1,447 @@
+{
+  "name": "ACS - Cozy Dark",
+  "type": "dark",
+  "colors": {
+    // ============================================================
+    // EDITOR - Calm, airy dark background with warm tones
+    // ============================================================
+    "editor.background": "#1e1a1a",
+    "editor.foreground": "#e8e0dc",
+    "editorLineNumber.foreground": "#6b5f5c",
+    "editorLineNumber.activeForeground": "#b08a82",
+    "editorCursor.foreground": "#c77f72",
+    "editor.selectionBackground": "#3d2f2d",
+    "editor.selectionHighlightBackground": "#342826",
+    "editor.inactiveSelectionBackground": "#2d2422",
+    "editor.wordHighlightBackground": "#3d2f2d80",
+    "editor.wordHighlightStrongBackground": "#4a3532",
+    "editor.findMatchBackground": "#5a3d38",
+    "editor.findMatchHighlightBackground": "#4a3532",
+    "editor.findRangeHighlightBackground": "#342826",
+    "editor.lineHighlightBackground": "#252020",
+    "editorWhitespace.foreground": "#3d3230",
+    "editorIndentGuide.background": "#333",
+    "editorIndentGuide.activeBackground": "#5a4d4a",
+    "editorRuler.foreground": "#3d3230",
+
+    // ============================================================
+    // ACTIVITY BAR - Soft grey with warm red accents
+    // ============================================================
+    "activityBar.background": "#1a1616",
+    "activityBar.foreground": "#c77f72",
+    "activityBar.inactiveForeground": "#7a6b67",
+    "activityBar.border": "#2d2422",
+    "activityBarBadge.background": "#b8665a",
+    "activityBarBadge.foreground": "#faf8f7",
+    "activityBar.activeBorder": "#c77f72",
+    "activityBar.activeBackground": "#252020",
+
+    // ============================================================
+    // SIDEBAR - Comfortable grey with subtle warmth
+    // ============================================================
+    "sideBar.background": "#1a1616",
+    "sideBar.foreground": "#d4cbc7",
+    "sideBar.border": "#2d2422",
+    "sideBarTitle.foreground": "#e8e0dc",
+    "sideBarSectionHeader.background": "#211c1c",
+    "sideBarSectionHeader.foreground": "#c77f72",
+    "sideBarSectionHeader.border": "#2d2422",
+
+    // ============================================================
+    // LISTS - Gentle selection with muted red
+    // ============================================================
+    "list.activeSelectionBackground": "#3d2f2d",
+    "list.activeSelectionForeground": "#f0e8e4",
+    "list.inactiveSelectionBackground": "#2d2422",
+    "list.inactiveSelectionForeground": "#e8e0dc",
+    "list.hoverBackground": "#252020",
+    "list.hoverForeground": "#e8e0dc",
+    "list.focusBackground": "#3d2f2d",
+    "list.focusForeground": "#f0e8e4",
+    "list.highlightForeground": "#c77f72",
+
+    // ============================================================
+    // TABS - Clean with soft red active indicator
+    // ============================================================
+    "editorGroupHeader.tabsBackground": "#1a1616",
+    "editorGroupHeader.tabsBorder": "#2d2422",
+    "tab.activeBackground": "#1e1a1a",
+    "tab.activeForeground": "#e8e0dc",
+    "tab.inactiveBackground": "#1a1616",
+    "tab.inactiveForeground": "#8a7b77",
+    "tab.activeBorder": "#c77f72",
+    "tab.activeBorderTop": "#c77f72",
+    "tab.border": "#2d2422",
+    "tab.hoverBackground": "#211c1c",
+    "tab.hoverForeground": "#d4cbc7",
+    "tab.unfocusedActiveBorder": "#8a7b77",
+    "tab.unfocusedActiveForeground": "#b0a19d",
+
+    // ============================================================
+    // STATUS BAR - Muted brick red with warmth
+    // ============================================================
+    "statusBar.background": "#4a3532",
+    "statusBar.foreground": "#f0e8e4",
+    "statusBar.border": "#2d2422",
+    "statusBar.debuggingBackground": "#8b4d44",
+    "statusBar.debuggingForeground": "#faf8f7",
+    "statusBar.noFolderBackground": "#3d2f2d",
+    "statusBarItem.activeBackground": "#5a4340",
+    "statusBarItem.hoverBackground": "#5a4340",
+    "statusBarItem.prominentBackground": "#8b4d44",
+    "statusBarItem.prominentHoverBackground": "#9b5a50",
+
+    // ============================================================
+    // TITLE BAR - Consistent dark with warm feel
+    // ============================================================
+    "titleBar.activeBackground": "#1a1616",
+    "titleBar.activeForeground": "#e8e0dc",
+    "titleBar.inactiveBackground": "#1a1616",
+    "titleBar.inactiveForeground": "#7a6b67",
+    "titleBar.border": "#2d2422",
+
+    // ============================================================
+    // BUTTONS - Warm muted red with soft hover
+    // ============================================================
+    "button.background": "#8b4d44",
+    "button.foreground": "#faf8f7",
+    "button.hoverBackground": "#9b5a50",
+    "button.secondaryBackground": "#4a3532",
+    "button.secondaryForeground": "#e8e0dc",
+    "button.secondaryHoverBackground": "#5a4340",
+
+    // ============================================================
+    // INPUTS - Soft contrast with warm borders
+    // ============================================================
+    "input.background": "#211c1c",
+    "input.foreground": "#e8e0dc",
+    "input.border": "#4a3532",
+    "input.placeholderForeground": "#7a6b67",
+    "inputOption.activeBorder": "#c77f72",
+    "inputOption.activeBackground": "#3d2f2d",
+    "inputOption.activeForeground": "#f0e8e4",
+    "inputValidation.errorBackground": "#1e1a1a",
+    "inputValidation.errorBorder": "#a84c41",
+    "inputValidation.warningBackground": "#1e1a1a",
+    "inputValidation.warningBorder": "#b8845a",
+
+    // ============================================================
+    // DROPDOWN & LISTS
+    // ============================================================
+    "dropdown.background": "#211c1c",
+    "dropdown.foreground": "#e8e0dc",
+    "dropdown.border": "#4a3532",
+    "dropdown.listBackground": "#1a1616",
+
+    // ============================================================
+    // NOTIFICATIONS - Subtle with warm tones
+    // ============================================================
+    "notifications.background": "#211c1c",
+    "notifications.foreground": "#e8e0dc",
+    "notifications.border": "#4a3532",
+    "notificationCenter.border": "#4a3532",
+    "notificationCenterHeader.background": "#252020",
+    "notificationCenterHeader.foreground": "#e8e0dc",
+    "notificationToast.border": "#4a3532",
+    "notificationsErrorIcon.foreground": "#c77f72",
+    "notificationsWarningIcon.foreground": "#b8845a",
+    "notificationsInfoIcon.foreground": "#8a9db8",
+
+    // ============================================================
+    // PANEL (Terminal, Output, etc.) - Warm dark base
+    // ============================================================
+    "panel.background": "#1a1616",
+    "panel.border": "#2d2422",
+    "panelTitle.activeBorder": "#c77f72",
+    "panelTitle.activeForeground": "#e8e0dc",
+    "panelTitle.inactiveForeground": "#8a7b77",
+    "panelInput.border": "#4a3532",
+
+    // ============================================================
+    // TERMINAL - Warm, cozy color palette
+    // ============================================================
+    "terminal.background": "#1a1616",
+    "terminal.foreground": "#d4cbc7",
+    "terminal.ansiBlack": "#2d2422",
+    "terminal.ansiRed": "#c77f72",
+    "terminal.ansiGreen": "#8ba87f",
+    "terminal.ansiYellow": "#c9a572",
+    "terminal.ansiBlue": "#8a9db8",
+    "terminal.ansiMagenta": "#b58a9f",
+    "terminal.ansiCyan": "#7fa5a0",
+    "terminal.ansiWhite": "#d4cbc7",
+    "terminal.ansiBrightBlack": "#5a4d4a",
+    "terminal.ansiBrightRed": "#d89386",
+    "terminal.ansiBrightGreen": "#a0ba95",
+    "terminal.ansiBrightYellow": "#dbb889",
+    "terminal.ansiBrightBlue": "#9fb0ca",
+    "terminal.ansiBrightMagenta": "#c9a0b3",
+    "terminal.ansiBrightCyan": "#95bab5",
+    "terminal.ansiBrightWhite": "#e8e0dc",
+    "terminalCursor.foreground": "#c77f72",
+    "terminalCursor.background": "#1a1616",
+
+    // ============================================================
+    // BREADCRUMBS - Subtle navigation
+    // ============================================================
+    "breadcrumb.foreground": "#8a7b77",
+    "breadcrumb.background": "#1e1a1a",
+    "breadcrumb.focusForeground": "#c77f72",
+    "breadcrumb.activeSelectionForeground": "#e8e0dc",
+    "breadcrumbPicker.background": "#1a1616",
+
+    // ============================================================
+    // SCROLLBAR - Minimal and subtle
+    // ============================================================
+    "scrollbarSlider.background": "#3d323080",
+    "scrollbarSlider.hoverBackground": "#4a3532a0",
+    "scrollbarSlider.activeBackground": "#5a4340c0",
+
+    // ============================================================
+    // BADGES - Warm red accent
+    // ============================================================
+    "badge.background": "#8b4d44",
+    "badge.foreground": "#faf8f7",
+
+    // ============================================================
+    // PROGRESS BAR - Muted red
+    // ============================================================
+    "progressBar.background": "#c77f72",
+
+    // ============================================================
+    // PEEK VIEW - Editor peek functionality
+    // ============================================================
+    "peekView.border": "#c77f72",
+    "peekViewEditor.background": "#211c1c",
+    "peekViewEditor.matchHighlightBackground": "#4a3532",
+    "peekViewResult.background": "#1a1616",
+    "peekViewResult.matchHighlightBackground": "#4a3532",
+    "peekViewResult.selectionBackground": "#3d2f2d",
+    "peekViewTitle.background": "#252020",
+    "peekViewTitleDescription.foreground": "#8a7b77",
+    "peekViewTitleLabel.foreground": "#e8e0dc",
+
+    // ============================================================
+    // GIT DECORATIONS - Subtle and warm
+    // ============================================================
+    "gitDecoration.addedResourceForeground": "#8ba87f",
+    "gitDecoration.modifiedResourceForeground": "#c9a572",
+    "gitDecoration.deletedResourceForeground": "#c77f72",
+    "gitDecoration.untrackedResourceForeground": "#8a9db8",
+    "gitDecoration.ignoredResourceForeground": "#5a4d4a",
+    "gitDecoration.conflictingResourceForeground": "#b8665a",
+
+    // ============================================================
+    // DIFF EDITOR - Clear change indicators
+    // ============================================================
+    "diffEditor.insertedTextBackground": "#8ba87f20",
+    "diffEditor.removedTextBackground": "#c77f7220",
+    "diffEditor.insertedLineBackground": "#8ba87f15",
+    "diffEditor.removedLineBackground": "#c77f7215",
+
+    // ============================================================
+    // WIDGET - Autocomplete, suggestions, etc.
+    // ============================================================
+    "editorWidget.background": "#211c1c",
+    "editorWidget.border": "#4a3532",
+    "editorWidget.foreground": "#e8e0dc",
+    "editorSuggestWidget.background": "#211c1c",
+    "editorSuggestWidget.border": "#4a3532",
+    "editorSuggestWidget.foreground": "#d4cbc7",
+    "editorSuggestWidget.highlightForeground": "#c77f72",
+    "editorSuggestWidget.selectedBackground": "#3d2f2d",
+    "editorHoverWidget.background": "#211c1c",
+    "editorHoverWidget.border": "#4a3532",
+
+    // ============================================================
+    // MENU - Consistent with overall theme
+    // ============================================================
+    "menu.background": "#211c1c",
+    "menu.foreground": "#d4cbc7",
+    "menu.selectionBackground": "#3d2f2d",
+    "menu.selectionForeground": "#f0e8e4",
+    "menu.separatorBackground": "#3d3230",
+    "menubar.selectionBackground": "#3d2f2d",
+    "menubar.selectionForeground": "#f0e8e4"
+  },
+
+  // ============================================================
+  // SYNTAX HIGHLIGHTING - Cozy palette with warm tones
+  // ============================================================
+  "tokenColors": [
+    {
+      "scope": ["comment", "punctuation.definition.comment"],
+      "settings": {
+        "foreground": "#7a6b67",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": [
+        "keyword",
+        "storage.type",
+        "storage.modifier",
+        "keyword.control",
+        "keyword.operator.new"
+      ],
+      "settings": {
+        "foreground": "#c77f72",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": [
+        "string",
+        "string.quoted",
+        "string.template"
+      ],
+      "settings": {
+        "foreground": "#8ba87f"
+      }
+    },
+    {
+      "scope": [
+        "constant.numeric",
+        "constant.language",
+        "constant.character"
+      ],
+      "settings": {
+        "foreground": "#c9a572"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.function",
+        "support.function",
+        "meta.function-call"
+      ],
+      "settings": {
+        "foreground": "#8a9db8"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.type",
+        "entity.name.class",
+        "support.type",
+        "support.class"
+      ],
+      "settings": {
+        "foreground": "#b58a9f"
+      }
+    },
+    {
+      "scope": [
+        "variable",
+        "variable.other",
+        "variable.parameter"
+      ],
+      "settings": {
+        "foreground": "#d4cbc7"
+      }
+    },
+    {
+      "scope": [
+        "variable.language",
+        "variable.other.constant"
+      ],
+      "settings": {
+        "foreground": "#b8845a",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.tag",
+        "entity.other.attribute-name"
+      ],
+      "settings": {
+        "foreground": "#c77f72"
+      }
+    },
+    {
+      "scope": [
+        "support.constant",
+        "constant.other"
+      ],
+      "settings": {
+        "foreground": "#b8665a"
+      }
+    },
+    {
+      "scope": [
+        "punctuation",
+        "meta.brace",
+        "meta.delimiter"
+      ],
+      "settings": {
+        "foreground": "#a08f8b"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.section",
+        "markup.heading"
+      ],
+      "settings": {
+        "foreground": "#c77f72",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": [
+        "markup.bold"
+      ],
+      "settings": {
+        "foreground": "#c9a572",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": [
+        "markup.italic"
+      ],
+      "settings": {
+        "foreground": "#b58a9f",
+        "fontStyle": "italic"
+      }
+    },
+    {
+      "scope": [
+        "markup.inline.raw",
+        "markup.fenced_code"
+      ],
+      "settings": {
+        "foreground": "#8ba87f"
+      }
+    },
+    {
+      "scope": [
+        "markup.underline.link"
+      ],
+      "settings": {
+        "foreground": "#8a9db8",
+        "fontStyle": "underline"
+      }
+    },
+    {
+      "scope": [
+        "invalid",
+        "invalid.illegal"
+      ],
+      "settings": {
+        "foreground": "#a84c41",
+        "fontStyle": "bold"
+      }
+    },
+    {
+      "scope": [
+        "invalid.deprecated"
+      ],
+      "settings": {
+        "foreground": "#b8665a",
+        "fontStyle": "italic"
+      }
+    }
+  ]
+}
