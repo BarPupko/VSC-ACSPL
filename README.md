@@ -32,7 +32,11 @@ This extension aims to **enhance your coding experience** by providing **syntax 
 - **High-level program flow commands**: `IF-ELSE`, `WHILE`, `LOOP`, `GOTO`
 - **Object-oriented structures**: `STRUCT`
 - **User-defined functions, subroutines, and autoroutines**
-- 💥🆕 **Supports G-Code** 🆕💥
+-  **Supports G-Code**
+- 💥**New Color Theme** 💥
+- 💥**A Monty AI Assistance for ACSPL+ And other matters.** 💥
+
+
 
 # Example Code for ACSPL+
 > **Note**  
